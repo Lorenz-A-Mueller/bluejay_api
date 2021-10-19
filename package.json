@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "apollo-server": "^3.4.0",
+    "graphql": "^15.6.1",
+    "ley": "^0.7.1",
+    "postgres": "^1.0.2"
+  }
+}
