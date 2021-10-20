@@ -116,7 +116,19 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     customers: () => {
-      return getCustomers();
+      return [
+        {
+          id: 1,
+          first_name: 'ich',
+          last_name: 'du',
+          email: 'asdf',
+          password: 'asdf',
+          phone_number: '33',
+          dob: '1991-03-23',
+          status: 'premium',
+        },
+      ];
+      //   getCustomers();
     },
     customer: (parent, args) => {
       return getCustomer(args.id);
