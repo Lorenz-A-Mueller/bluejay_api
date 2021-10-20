@@ -2,7 +2,7 @@ export async function up(
   sql: (arg: TemplateStringsArray) => Promise<string[]>,
 ) {
   console.log('Inserting customers into customers table...');
-  const customer = await sql`
+  await sql`
 
 INSERT INTO customers
 (first_name, last_name, email, password, phone_number, dob, status)
