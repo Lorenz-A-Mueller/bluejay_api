@@ -2,7 +2,8 @@
   "scripts": {
     "dev": "nodemon / index.js",
     "migrate": "dotenv ley -- --require ts-node/register",
-    "start": "node index.js"
+    "start": "node index.js",
+    "heroku-postbuild": "yarn migrate up && yarn build"
   },
   "dependencies": {
     "apollo-server": "^3.4.0",
