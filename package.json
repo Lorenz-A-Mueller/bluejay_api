@@ -1,7 +1,8 @@
 {
   "scripts": {
     "dev": "nodemon / index.js",
-    "migrate": "dotenv ley -- --require ts-node/register"
+    "migrate": "dotenv ley -- --require ts-node/register",
+    "start": "node index.js"
   },
   "dependencies": {
     "apollo-server": "^3.4.0",
