@@ -1,4 +1,4 @@
-import setPostgresDefaultsOnHeroku from './setPostgresDefaultsOnHeroku';
+const setPostgresDefaultsOnHeroku = require('./setPostgresDefaultsOnHeroku');
 
 const { ApolloServer, gql } = require('apollo-server');
 
