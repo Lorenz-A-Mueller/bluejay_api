@@ -1,0 +1,9 @@
+{
+  "exclude": ["node_modules", "build"],
+  "ts-node": {
+    "transpileOnly": true,
+    "compilerOptions": {
+      "module": "commonjs"
+    }
+  }
+}
