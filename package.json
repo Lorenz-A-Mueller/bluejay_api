@@ -5,7 +5,6 @@
   },
   "dependencies": {
     "apollo-server": "^3.4.0",
-    "babel-preset-env": "^1.7.0",
     "dotenv-cli": "^4.0.0",
     "graphql": "^15.6.1",
     "ley": "^0.7.1",
