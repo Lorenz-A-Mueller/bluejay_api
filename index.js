@@ -4,31 +4,31 @@ const { ApolloServer, gql } = require('apollo-server');
 
 require('dotenv').config();
 const postgres = require('postgres');
-const sql = postgres();
+// const sql = postgres();
 
 // Connect only once to the database
 // https://github.com/vercel/next.js/issues/7811#issuecomment-715259370
-// function connectOneTimeToDatabase() {
-//   let sql;
+function connectOneTimeToDatabase() {
+  let sql;
 
-//   if (process.env.NODE_ENV === 'production') {
-//     // Heroku needs SSL connections but
-//     // has an "unauthorized" certificate
-//     // https://devcenter.heroku.com/changelog-items/852
-//     sql = postgres({ ssl: { rejectUnauthorized: false } });
-//   } else {
-//     // When we're in development, make sure that we connect only
-//     // once to the database
-//     if (!globalThis.postgresSqlClient) {
-//       globalThis.postgresSqlClient = postgres();
-//     }
-//     sql = globalThis.postgresSqlClient;
-//   }
+  if (process.env.NODE_ENV === 'production') {
+    // Heroku needs SSL connections but
+    // has an "unauthorized" certificate
+    // https://devcenter.heroku.com/changelog-items/852
+    sql = postgres({ ssl: { rejectUnauthorized: false } });
+  } else {
+    // When we're in development, make sure that we connect only
+    // once to the database
+    if (!globalThis.postgresSqlClient) {
+      globalThis.postgresSqlClient = postgres();
+    }
+    sql = globalThis.postgresSqlClient;
+  }
 
-//   return sql;
-// }
+  return sql;
+}
 
-// const sql = connectOneTimeToDatabase();
+const sql = connectOneTimeToDatabase();
 
 async function getCustomers() {
   const customers = await sql`
@@ -116,19 +116,19 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     customers: () => {
-      return [
-        {
-          id: 1,
-          first_name: 'ich',
-          last_name: 'du',
-          email: 'asdf',
-          password: 'asdf',
-          phone_number: '33',
-          dob: '1991-03-23',
-          status: 'premium',
-        },
-      ];
-      //   getCustomers();
+      // return [
+      //   {
+      //     id: 1,
+      //     first_name: 'ich',
+      //     last_name: 'du',
+      //     email: 'asdf',
+      //     password: 'asdf',
+      //     phone_number: '33',
+      //     dob: '1991-03-23',
+      //     status: 'premium',
+      //   },
+      // ];
+      getCustomers();
     },
     customer: (parent, args) => {
       return getCustomer(args.id);
