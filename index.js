@@ -128,7 +128,7 @@ const resolvers = {
       //     status: 'premium',
       //   },
       // ];
-      getCustomers();
+      return getCustomers();
     },
     customer: (parent, args) => {
       return getCustomer(args.id);
