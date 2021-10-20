@@ -1,8 +1,3 @@
-import {
-  ApolloServerPluginLandingPageLocalDefault,
-  ApolloServerPluginLandingPageProductionDefault,
-} from 'apollo-server-core';
-
 const { ApolloServer, gql } = require('apollo-server');
 
 require('dotenv').config();
