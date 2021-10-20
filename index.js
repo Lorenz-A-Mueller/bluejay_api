@@ -1,11 +1,11 @@
 const setPostgresDefaultsOnHeroku = require('./setPostgresDefaultsOnHeroku');
 
 const { ApolloServer, gql } = require('apollo-server');
+setPostgresDefaultsOnHeroku();
 
 require('dotenv').config();
 const postgres = require('postgres');
 // const sql = postgres();
-setPostgresDefaultsOnHeroku();
 
 // Connect only once to the database
 // https://github.com/vercel/next.js/issues/7811#issuecomment-715259370
