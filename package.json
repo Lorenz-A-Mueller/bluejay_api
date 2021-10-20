@@ -3,7 +3,8 @@
     "dev": "nodemon / index.js",
     "migrate": "dotenv ley -- --require ts-node/register",
     "start": "node index.js",
-    "heroku-postbuild": "yarn migrate up && yarn build"
+    "heroku-postbuild": "yarn migrate up && yarn build",
+    "build": "node build/build.js"
   },
   "dependencies": {
     "apollo-server": "^3.4.0",
@@ -14,8 +15,7 @@
     "pg-connection-string": "^2.5.0",
     "postgres": "^1.0.2",
     "ts-node": "^10.3.0",
-    "typescript": "^4.2.4",
-    "build": "node build/build.js"
+    "typescript": "^4.2.4"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.15.4",
