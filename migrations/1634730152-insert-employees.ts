@@ -1,5 +1,6 @@
 const employees = [
   {
+    number: '00001',
     firstName: 'Jennifer',
     lastName: 'Smith',
     email: 'jennifer.smith@bluejay.com',
@@ -8,6 +9,7 @@ const employees = [
     admin: true,
   },
   {
+    number: '00002',
     firstName: 'John',
     lastName: 'Hilton',
     email: 'john.hilton@bluejay.com',
@@ -16,6 +18,7 @@ const employees = [
     admin: false,
   },
   {
+    number: '00003',
     firstName: 'Lisa',
     lastName: 'Verdi',
     email: 'lisa.verdi@bluejay.com',
@@ -24,6 +27,7 @@ const employees = [
     admin: false,
   },
   {
+    number: '00004',
     firstName: 'Abdullah',
     lastName: 'Khan',
     email: 'abdullah.khan@bluejay.com',
@@ -32,6 +36,7 @@ const employees = [
     admin: false,
   },
   {
+    number: '00005',
     firstName: 'Tatyana',
     lastName: 'Melnikova',
     email: 'tatyana.melnikova@bluejay.com',
@@ -40,6 +45,7 @@ const employees = [
     admin: false,
   },
   {
+    number: '00006',
     firstName: 'Quentin',
     lastName: 'York',
     email: 'quentin.york@bluejay.com',
@@ -57,7 +63,8 @@ export async function up(
     arg4: string,
     arg5: string,
     arg6: string,
-    arg7: boolean,
+    arg7: string,
+    arg8: boolean,
   ) => Promise<string[]>,
 ) {
   console.log('Inserting employees into employees table...');
@@ -65,9 +72,9 @@ export async function up(
   for (const person of employees) {
     await sql`
 		INSERT INTO employees
-		(first_name, last_name, email, password, dob, admin)
+		(number, first_name, last_name, email, password, dob, admin)
 		VALUES
-		(${person.firstName}, ${person.lastName}, ${person.email}, ${person.password}, ${person.dob}, ${person.admin});
+		(${person.number}, ${person.firstName}, ${person.lastName}, ${person.email}, ${person.password}, ${person.dob}, ${person.admin});
 			`;
   }
   return;

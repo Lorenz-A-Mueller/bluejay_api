@@ -74,10 +74,19 @@ async function getEmployees() {
   return employees;
 }
 
-async function getEmployee(id) {
+async function getEmployeeById(id) {
   const employee = await sql`
   SELECT * FROM employees
   WHERE id=${id};
+
+  `;
+  return employee[0];
+}
+
+async function getEmployeeByNumber(number) {
+  const employee = await sql`
+  SELECT * FROM employees
+  WHERE number=${number};
 
   `;
   return employee[0];
@@ -89,14 +98,19 @@ const typeDefs = gql`
     id: ID
     number: String
   }
+  input employeeSearch {
+    id: ID
+    number: String
+  }
   type Query {
     customers: [Customer]
     customer(search: customerSearch!): Customer
     employees: [Employee]
-    employee(id: ID!): Employee
+    employee(search: employeeSearch!): Employee
   }
   type Mutation {
     createCustomer(
+      number: String!
       first_name: String!
       last_name: String!
       email: String!
@@ -119,6 +133,7 @@ const typeDefs = gql`
   }
   type Employee {
     id: ID
+    number: String
     first_name: String
     last_name: String
     email: String
@@ -131,30 +146,18 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     customers: () => {
-      // return [
-      //   {
-      //     id: 1,
-      //     first_name: 'ich',
-      //     last_name: 'du',
-      //     email: 'asdf',
-      //     password: 'asdf',
-      //     phone_number: '33',
-      //     dob: '1991-03-23',
-      //     status: 'premium',
-      //   },
-      // ];
       return getCustomers();
     },
     customer: (parent, args) => {
       if (args.search.id) return getCustomerById(args.search.id);
       if (args.search.number) return getCustomerByNumber(args.search.number);
-      return;
     },
     employees: () => {
       return getEmployees();
     },
     employee: (parent, args) => {
-      return getEmployee(args.id);
+      if (args.search.id) return getEmployeeById(args.search.id);
+      if (args.search.number) return getEmployeeByNumber(args.search.number);
     },
   },
   Mutation: {

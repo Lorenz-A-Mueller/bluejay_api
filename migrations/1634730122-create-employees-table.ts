@@ -6,6 +6,7 @@ export async function up(
 
 CREATE TABLE employees(
 id integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+number varchar(10) NOT NULL,
 first_name varchar(30) NOT NULL,
 last_name varchar(30) NOT NULL,
 email varchar(30) NOT NULL,
