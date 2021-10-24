@@ -5,9 +5,9 @@ export async function up(
   await sql`
 
 INSERT INTO customers
-(first_name, last_name, email, password, phone_number, dob, status)
+(number, first_name, last_name, email, password, phone_number, dob, status)
 VALUES
-('Lorenz', 'Mueller', 'lorenz.a.mueller@gmail.com', 'MyTestPassword1', '004300000', '1991-12-26', 'premium')
+('0000000001', 'Lorenz', 'Mueller', 'lorenz.a.mueller@gmail.com', 'MyTestPassword1', '004300000', '1991-12-26', 'premium')
 	`;
 }
 

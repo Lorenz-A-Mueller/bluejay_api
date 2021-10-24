@@ -38,10 +38,19 @@ async function getCustomers() {
   return customers;
 }
 
-async function getCustomer(id) {
+async function getCustomerById(id) {
   const customer = await sql`
   SELECT * FROM customers
   WHERE id=${id};
+
+  `;
+  return customer[0];
+}
+
+async function getCustomerByNumber(number) {
+  const customer = await sql`
+  SELECT * FROM customers
+  WHERE number=${number};
 
   `;
   return customer[0];
@@ -78,7 +87,7 @@ const typeDefs = gql`
   scalar Date
   type Query {
     customers: [Customer]
-    customer(id: ID!): Customer
+    customer(id: ID | number: String)!: Customer
     employees: [Employee]
     employee(id: ID!): Employee
   }
@@ -132,7 +141,9 @@ const resolvers = {
       return getCustomers();
     },
     customer: (parent, args) => {
-      return getCustomer(args.id);
+      if (args.id) return getCustomerById(args.id);
+      if (args.number) return getCustomerByNumber(args.number);
+      return;
     },
     employees: () => {
       return getEmployees();
