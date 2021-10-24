@@ -85,9 +85,13 @@ async function getEmployee(id) {
 
 const typeDefs = gql`
   scalar Date
+  input customerSearch {
+    id: ID
+    number: String
+  }
   type Query {
     customers: [Customer]
-    customer(id: ID | number: String)!: Customer
+    customer(search: customerSearch!): Customer
     employees: [Employee]
     employee(id: ID!): Employee
   }
@@ -141,8 +145,8 @@ const resolvers = {
       return getCustomers();
     },
     customer: (parent, args) => {
-      if (args.id) return getCustomerById(args.id);
-      if (args.number) return getCustomerByNumber(args.number);
+      if (args.search.id) return getCustomerById(args.search.id);
+      if (args.search.number) return getCustomerByNumber(args.search.number);
       return;
     },
     employees: () => {
