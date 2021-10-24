@@ -108,6 +108,7 @@ const typeDefs = gql`
   }
   type Customer {
     id: ID
+    number: String
     first_name: String
     last_name: String
     email: String
