@@ -1,12 +1,12 @@
-import { ApolloServer, gql } from 'apollo-server';
-import dotenv from 'dotenv';
-import postgres from 'postgres';
-import setPostgresDefaultsOnHeroku from './setPostgresDefaultsOnHeroku.js';
-import { hashPassword, verifyPassword } from './utils/auth.js';
+const postgres = require('postgres');
+const setPostgresDefaultsOnHeroku = require('./setPostgresDefaultsOnHeroku.js');
+const { hashPassword, verifyPassword } = require('./utils/auth.js');
+
+const { ApolloServer, gql } = require('apollo-server');
 
 setPostgresDefaultsOnHeroku();
 
-dotenv.config();
+require('dotenv').config();
 
 // const sql = postgres();
 
