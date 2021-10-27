@@ -1,12 +1,11 @@
 const postgres = require('postgres');
 const setPostgresDefaultsOnHeroku = require('./setPostgresDefaultsOnHeroku.js');
 const { hashPassword, verifyPassword } = require('./utils/auth.js');
-
 const { ApolloServer, gql } = require('apollo-server');
 
-setPostgresDefaultsOnHeroku();
-
 require('dotenv').config();
+
+setPostgresDefaultsOnHeroku();
 
 // const sql = postgres();
 
