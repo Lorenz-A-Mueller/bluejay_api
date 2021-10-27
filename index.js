@@ -35,7 +35,8 @@ const sql = connectOneTimeToDatabase();
 
 async function getCustomers() {
   const customers = await sql`
-  SELECT (number, first_name, last_name, email, password_hashed, phone_number, dob, status)
+  SELECT
+  number, first_name, last_name, email, password_hashed, phone_number, dob, status
   FROM customers;
   `;
   return customers;
@@ -44,7 +45,7 @@ async function getCustomers() {
 async function getCustomerById(id) {
   const customer = await sql`
   SELECT
-  (number, first_name, last_name, email, phone_number, dob, status)
+  number, first_name, last_name, email, phone_number, dob, status
   FROM customers
   WHERE id=${id};
 
@@ -76,7 +77,7 @@ async function createCustomer(newCustomer) {
 async function getEmployees() {
   const employees = await sql`
   SELECT
-  (number, first_name, last_name, email, password_hashed, dob, admin)
+  number, first_name, last_name, email, dob, admin
   FROM employees;
   `;
   return employees;
@@ -85,7 +86,7 @@ async function getEmployees() {
 async function getEmployeeById(id) {
   const employee = await sql`
   SELECT
-  (number, first_name, last_name, email, password_hashed, dob, admin)
+  number, first_name, last_name, email, password_hashed, dob, admin
   FROM employees
   WHERE id=${id};
 
@@ -110,7 +111,7 @@ const typeDefs = gql`
   }
   input employeeSearch {
     id: ID
-    number: String
+    number: [String]
   }
 
   type Query {
@@ -142,6 +143,16 @@ const typeDefs = gql`
     dob: Date
     status: String
   }
+  # type CustomerWithoutPassword {
+  #   id: ID
+  #   number: String
+  #   first_name: String
+  #   last_name: String
+  #   email: String
+  #   phone_number: String
+  #   dob: Date
+  #   status: String
+  # }
   type Employee {
     id: ID
     number: String
@@ -152,6 +163,15 @@ const typeDefs = gql`
     dob: Date
     admin: Boolean
   }
+  # type EmployeeWithoutPassword {
+  #   id: ID
+  #   number: String
+  #   first_name: String
+  #   last_name: String
+  #   email: String
+  #   dob: Date
+  #   admin: Boolean
+  # }
 `;
 
 const resolvers = {
