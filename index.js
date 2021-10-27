@@ -1,4 +1,4 @@
-import { hashPassword, verifyPassword } from './utils/auth';
+const { hashPassword, verifyPassword } = require('./utils/auth.js');
 
 const setPostgresDefaultsOnHeroku = require('./setPostgresDefaultsOnHeroku');
 
@@ -124,7 +124,7 @@ const typeDefs = gql`
       first_name: String!
       last_name: String!
       email: String!
-      password: String!
+      password_hashed: String!
       phone_number: String!
       dob: Date!
       status: String!
@@ -136,7 +136,7 @@ const typeDefs = gql`
     first_name: String
     last_name: String
     email: String
-    password: String
+    password_hashed: String
     phone_number: String
     dob: Date
     status: String
@@ -147,7 +147,7 @@ const typeDefs = gql`
     first_name: String
     last_name: String
     email: String
-    password: String
+    password_hashed: String
     dob: Date
     admin: Boolean
   }
