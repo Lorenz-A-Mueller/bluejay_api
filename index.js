@@ -1,3 +1,5 @@
+import { hashPassword, verifyPassword } from './utils/auth';
+
 const setPostgresDefaultsOnHeroku = require('./setPostgresDefaultsOnHeroku');
 
 const { ApolloServer, gql } = require('apollo-server');
