@@ -176,6 +176,7 @@ const resolvers = {
   },
   Mutation: {
     createCustomer: (parent, args) => {
+      args.password = hashPassword(args.password);
       return createCustomer(args);
     },
   },
