@@ -1,7 +1,7 @@
 import { ApolloServer, gql } from 'apollo-server';
 import dotenv from 'dotenv';
 import postgres from 'postgres';
-import { setPostgresDefaultsOnHeroku } from './setPostgresDefaultsOnHeroku.js';
+import setPostgresDefaultsOnHeroku from './setPostgresDefaultsOnHeroku.js';
 import { hashPassword, verifyPassword } from './utils/auth.js';
 
 setPostgresDefaultsOnHeroku();
