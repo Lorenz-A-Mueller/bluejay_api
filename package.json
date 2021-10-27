@@ -1,5 +1,4 @@
 {
-  "type": "module",
   "scripts": {
     "dev": "nodemon / index.js",
     "migrate": "dotenv ley -- --require ts-node/register",
