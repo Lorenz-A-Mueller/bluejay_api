@@ -64,7 +64,8 @@ async function createCustomer(newCustomer) {
   (first_name, last_name, email, password, phone_number, dob, status)
   VALUES
   (${newCustomer.first_name}, ${newCustomer.last_name}, ${newCustomer.email}, ${newCustomer.password}, ${newCustomer.phone_number}, ${newCustomer.dob}, ${newCustomer.status})
-  RETURNING *
+  RETURNING
+  (first_name, last_name, email, phone_number, dob, status)
   `;
   return customer[0];
 }

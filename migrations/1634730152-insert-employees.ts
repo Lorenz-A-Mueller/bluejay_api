@@ -1,3 +1,5 @@
+import { hashPassword } from '../utils/auth';
+
 const employees = [
   {
     number: '00001',
@@ -70,11 +72,12 @@ export async function up(
   console.log('Inserting employees into employees table...');
 
   for (const person of employees) {
+    const hashedPassword = await hashPassword(person.password);
     await sql`
 		INSERT INTO employees
-		(number, first_name, last_name, email, password, dob, admin)
+		(number, first_name, last_name, email, password_hashed, dob, admin)
 		VALUES
-		(${person.number}, ${person.firstName}, ${person.lastName}, ${person.email}, ${person.password}, ${person.dob}, ${person.admin});
+		(${person.number}, ${person.firstName}, ${person.lastName}, ${person.email}, ${hashedPassword}, ${person.dob}, ${person.admin});
 			`;
   }
   return;

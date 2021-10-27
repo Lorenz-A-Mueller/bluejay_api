@@ -10,7 +10,7 @@ number varchar(10) NOT NULL,
 first_name varchar(30) NOT NULL,
 last_name varchar(30) NOT NULL,
 email varchar(30) NOT NULL,
-password varchar(20) NOT NULL,
+password_hashed varchar(60) NOT NULL,
 phone_number varchar(15) NOT NULL,
 dob date NOT NULL,
 status varchar(10) NOT NULL
