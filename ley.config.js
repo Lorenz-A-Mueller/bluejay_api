@@ -1,10 +1,7 @@
-const setPostgresDefaultsOnHeroku = require('./setPostgresDefaultsOnHeroku');
+import setPostgresDefaultsOnHeroku from './setPostgresDefaultsOnHeroku';
 
 setPostgresDefaultsOnHeroku();
-const options = {};
-
+export const options = {};
 if (process.env.NODE_ENV === 'production') {
   options.ssl = { rejectUnauthorized: false };
 }
-
-module.exports = options;
