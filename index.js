@@ -35,21 +35,24 @@ const sql = connectOneTimeToDatabase();
 
 async function getCustomers() {
   const customers = await sql`
-  SELECT * FROM customers;
+  SELECT (number, first_name, last_name, email, password_hashed, phone_number, dob, status)
+  FROM customers;
   `;
   return customers;
 }
 
 async function getCustomerById(id) {
   const customer = await sql`
-  SELECT * FROM customers
+  SELECT
+  (number, first_name, last_name, email, phone_number, dob, status)
+  FROM customers
   WHERE id=${id};
 
   `;
   return customer[0];
 }
 
-async function getCustomerByNumber(number) {
+async function getCustomerByNumberWithHashedPassword(number) {
   const customer = await sql`
   SELECT * FROM customers
   WHERE number=${number};
@@ -72,21 +75,25 @@ async function createCustomer(newCustomer) {
 
 async function getEmployees() {
   const employees = await sql`
-  SELECT * FROM employees;
+  SELECT
+  (number, first_name, last_name, email, password_hashed, dob, admin)
+  FROM employees;
   `;
   return employees;
 }
 
 async function getEmployeeById(id) {
   const employee = await sql`
-  SELECT * FROM employees
+  SELECT
+  (number, first_name, last_name, email, password_hashed, dob, admin)
+  FROM employees
   WHERE id=${id};
 
   `;
   return employee[0];
 }
 
-async function getEmployeeByNumber(number) {
+async function getEmployeeByNumberWithHashedPassword(number) {
   const employee = await sql`
   SELECT * FROM employees
   WHERE number=${number};
@@ -153,14 +160,18 @@ const resolvers = {
     },
     customer: (parent, args) => {
       if (args.search.id) return getCustomerById(args.search.id);
-      if (args.search.number) return getCustomerByNumber(args.search.number);
+      if (args.search.number) {
+        return getCustomerByNumberWithHashedPassword(args.search.number);
+      }
     },
     employees: () => {
       return getEmployees();
     },
     employee: (parent, args) => {
       if (args.search.id) return getEmployeeById(args.search.id);
-      if (args.search.number) return getEmployeeByNumber(args.search.number);
+      if (args.search.number) {
+        return getEmployeeByNumberWithHashedPassword(args.search.number);
+      }
     },
   },
   Mutation: {
