@@ -1,14 +1,14 @@
-const bcrypt = require('bcrypt');
+import bcrypt from 'bcrypt';
 
-const hashPassword = (plaintextPassword) => {
+export const hashPassword = (plaintextPassword) => {
   const passwordHashed = bcrypt.hash(plaintextPassword, 10);
   return passwordHashed;
 };
 
-const verifyPassword = (plaintextPassword, hashedPassword) => {
+export const verifyPassword = (plaintextPassword, hashedPassword) => {
   const passwordIsVerified = bcrypt.compare(plaintextPassword, hashedPassword);
   return passwordIsVerified;
 };
 
-module.exports.hashPassword = hashPassword;
-module.exports.verifyPassword = verifyPassword;
+// module.exports.hashPassword = hashPassword;
+// module.exports.verifyPassword = verifyPassword;

@@ -1,12 +1,13 @@
-const { hashPassword, verifyPassword } = require('./utils/auth.js');
+import { ApolloServer, gql } from 'apollo-server';
+import dotenv from 'dotenv';
+import postgres from 'postgres';
+import { setPostgresDefaultsOnHeroku } from './setPostgresDefaultsOnHeroku.js';
+import { hashPassword, verifyPassword } from './utils/auth.js';
 
-const setPostgresDefaultsOnHeroku = require('./setPostgresDefaultsOnHeroku');
-
-const { ApolloServer, gql } = require('apollo-server');
 setPostgresDefaultsOnHeroku();
 
-require('dotenv').config();
-const postgres = require('postgres');
+dotenv.config();
+
 // const sql = postgres();
 
 // Connect only once to the database
@@ -106,12 +107,13 @@ const typeDefs = gql`
   scalar Date
   input customerSearch {
     id: ID
-    number: String
+    number: [String]
   }
   input employeeSearch {
     id: ID
     number: String
   }
+
   type Query {
     customers: [Customer]
     customer(search: customerSearch!): Customer
@@ -158,10 +160,30 @@ const resolvers = {
     customers: () => {
       return getCustomers();
     },
-    customer: (parent, args) => {
+    customer: async (parent, args) => {
       if (args.search.id) return getCustomerById(args.search.id);
       if (args.search.number) {
-        return getCustomerByNumberWithHashedPassword(args.search.number);
+        console.log('first arg: ', args.search.number[0]);
+        console.log('second arg: ', args.search.number[1]);
+
+        const hashedPasswordInDb = await getCustomerByNumberWithHashedPassword(
+          args.search.number[0],
+        );
+        console.log(
+          'hashed password in db: ',
+          hashedPasswordInDb.password_hashed,
+        );
+        const passWordsMatch = await verifyPassword(
+          args.search.number[1],
+          hashedPasswordInDb.password_hashed,
+        );
+        console.log('passwordsmatch', passWordsMatch);
+        if (passWordsMatch) {
+          const { password_hashed, ...customerWithoutHashedPassword } =
+            await getCustomerByNumberWithHashedPassword(args.search.number[0]);
+          return customerWithoutHashedPassword;
+        }
+        return;
       }
     },
     employees: () => {
@@ -170,7 +192,7 @@ const resolvers = {
     employee: (parent, args) => {
       if (args.search.id) return getEmployeeById(args.search.id);
       if (args.search.number) {
-        return getEmployeeByNumberWithHashedPassword(args.search.number);
+        return getEmployeeByNumberWithHashedPassword(args.search.number[0]);
       }
     },
   },
