@@ -1,5 +1,5 @@
 const { ApolloServer, gql } = require('apollo-server');
-const { AuthenticationError } = require('apollo-server-errors');
+const { AuthenticationError, UserInputError } = require('apollo-server-errors');
 const setPostgresDefaultsOnHeroku = require('./setPostgresDefaultsOnHeroku.js');
 const { hashPassword, verifyPassword } = require('./utils/auth.js');
 
@@ -185,6 +185,10 @@ const resolvers = {
       if (args.search.number) {
         console.log('first arg: ', args.search.number[0]);
         console.log('second arg: ', args.search.number[1]);
+
+        if (!args.search.number[0] || !args.search.number[1]) {
+          throw new UserInputError('Password and Username are required!');
+        }
 
         const hashedPasswordInDb = await getCustomerByNumberWithHashedPassword(
           args.search.number[0],
