@@ -189,10 +189,10 @@ const resolvers = {
         const hashedPasswordInDb = await getCustomerByNumberWithHashedPassword(
           args.search.number[0],
         );
-        console.log(
-          'hashed password in db: ',
-          hashedPasswordInDb.password_hashed,
-        );
+        // console.log(
+        //   'hashed password in db: ',
+        //   hashedPasswordInDb.password_hashed,
+        // );
         const passWordsMatch = await verifyPassword(
           args.search.number[1],
           hashedPasswordInDb.password_hashed,
