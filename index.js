@@ -2,6 +2,8 @@ const { ApolloServer, gql } = require('apollo-server');
 const { AuthenticationError, UserInputError } = require('apollo-server-errors');
 const setPostgresDefaultsOnHeroku = require('./setPostgresDefaultsOnHeroku.js');
 const { hashPassword, verifyPassword } = require('./utils/auth.js');
+const cookie = require('cookie');
+const crypto = require('node:crypto');
 
 require('dotenv').config();
 const postgres = require('postgres');
@@ -102,6 +104,15 @@ async function getEmployeeByNumberWithHashedPassword(number) {
 
   `;
   return employee[0];
+}
+
+async function createCustomerSessions(token, id) {
+  const session = await sql`
+  INSERT INTO customer_sessions
+  (token, customer_id)
+  VALUES
+  (${token}, ${id})
+  `;
 }
 
 const typeDefs = gql`
