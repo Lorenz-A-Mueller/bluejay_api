@@ -1,4 +1,5 @@
 const { ApolloServer, gql } = require('apollo-server');
+const { AuthenticationError } = require('apollo-server-errors');
 const setPostgresDefaultsOnHeroku = require('./setPostgresDefaultsOnHeroku.js');
 const { hashPassword, verifyPassword } = require('./utils/auth.js');
 
@@ -202,7 +203,12 @@ const resolvers = {
             await getCustomerByNumberWithHashedPassword(args.search.number[0]);
           return customerWithoutHashedPassword;
         }
-        return;
+        // if (!passWordsMatch) {
+        throw new AuthenticationError(
+          'Password/Username combination did not match!',
+        );
+        // }
+        // return;
       }
     },
     employees: () => {
