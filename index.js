@@ -3,7 +3,6 @@ const { AuthenticationError, UserInputError } = require('apollo-server-errors');
 const crypto = require('node:crypto');
 const setPostgresDefaultsOnHeroku = require('./setPostgresDefaultsOnHeroku.js');
 const { hashPassword, verifyPassword } = require('./utils/auth.js');
-const cookie = require('cookie');
 const cors = require('cors');
 const express = require('express');
 
@@ -115,6 +114,16 @@ async function createCustomerSession(token, id) {
   return session[0];
 }
 
+async function deleteExpiredCustomerSessions() {
+  const sessions = await sql`
+  DELETE FROM customer_sessions
+  WHERE
+  expiry_timestamp < NOW()
+  RETURNING *
+  `;
+  return sessions;
+}
+
 const typeDefs = gql`
   scalar Date
   input customerSearch {
@@ -213,26 +222,27 @@ const resolvers = {
         );
         console.log('passwordsmatch', passWordsMatch);
         if (passWordsMatch) {
+          // destructure -> only return the customer without the hashed_password
+
           const { password_hashed, ...customerWithoutHashedPassword } =
             await getCustomerByNumberWithHashedPassword(args.search.number[0]);
 
+          // clean ALL expired sessions
+
+          deleteExpiredCustomerSessions();
+
+          // generate a random token
+
           const token = crypto.randomBytes(64).toString('base64');
 
-          console.log('token', token);
-          console.log(
-            'customerWithoutHashedPassword.id',
-            customerWithoutHashedPassword.id,
-          );
+          // safe token and client id as a session in the DB
 
           const newSession = await createCustomerSession(
             token,
             customerWithoutHashedPassword.id,
           );
 
-          console.log('newSession', newSession);
-          console.log('newSession.token', newSession.token);
-
-          // console.log('context: ', context);
+          // set client's sessionToken cookie with the stored token value
           context.res.cookie('sessionToken', newSession.token, {
             httpOnly: true,
           });
@@ -244,8 +254,6 @@ const resolvers = {
         throw new AuthenticationError(
           'Password/Username combination did not match!',
         );
-        // }
-        // return;
       }
     },
     employees: () => {
@@ -295,7 +303,7 @@ const main = async () => {
   // });
 
   app.listen(process.env.PORT || 4000, () => {
-    console.log(`🚀  Server ready!`);
+    console.log(`🚀  Server ready at port ${process.env.PORT || 4000}`);
   });
 };
 
