@@ -137,6 +137,13 @@ async function getValidCustomerSessionByToken(token) {
   return customerSession[0];
 }
 
+async function getAllTickets() {
+  const tickets = await sql`
+  SELECT * FROM tickets;
+  `;
+  return tickets;
+}
+
 const typeDefs = gql`
   scalar Date
   scalar Timestamp
@@ -155,6 +162,7 @@ const typeDefs = gql`
     employee(search: employeeSearch!): Employee
     customerSession(token: String!): Session
     deleteAllExpiredCustomerSessions: [Session]
+    tickets: [Ticket]
   }
   type Mutation {
     createCustomer(
@@ -194,6 +202,19 @@ const typeDefs = gql`
     token: String
     expiry_timestamp: Timestamp
     customer_id: ID
+  }
+  type Ticket {
+    id: ID
+    ticket_number: String
+    status: String
+    last_response: String #????
+    customer_id: ID
+    category: String
+    priority: String
+    created: String #???
+    assignee_id: ID
+    title: String
+    message: [String]
   }
 `;
 
@@ -275,6 +296,9 @@ const resolvers = {
     deleteAllExpiredCustomerSessions: () => {
       return deleteExpiredCustomerSessions();
     },
+    tickets: () => {
+      return getAllTickets();
+    },
   },
   Mutation: {
     createCustomer: (parent, args) => {
@@ -286,8 +310,8 @@ const resolvers = {
 
 const app = express();
 const corsOptions = {
-  //   origin: '*',
-  origin: 'http://localhost:19006',
+  origin: '*',
+  // origin: 'http://localhost:19006',
   credentials: true,
 };
 app.use(cors(corsOptions));
