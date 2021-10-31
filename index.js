@@ -154,6 +154,7 @@ const typeDefs = gql`
     employees: [Employee]
     employee(search: employeeSearch!): Employee
     customerSession(token: String!): Session
+    deleteAllExpiredCustomerSessions: [Session]
   }
   type Mutation {
     createCustomer(
@@ -271,6 +272,9 @@ const resolvers = {
       // console.log('args.token', args.token);
       if (args.token) return getValidCustomerSessionByToken(args.token);
     },
+    deleteAllExpiredCustomerSessions: () => {
+      return deleteExpiredCustomerSessions();
+    },
   },
   Mutation: {
     createCustomer: (parent, args) => {
@@ -282,8 +286,8 @@ const resolvers = {
 
 const app = express();
 const corsOptions = {
-  origin: '*',
-  // origin: 'http://localhost:19006',
+  // origin: '*',
+  origin: 'http://localhost:19006',
   credentials: true,
 };
 app.use(cors(corsOptions));
