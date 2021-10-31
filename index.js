@@ -125,18 +125,21 @@ async function deleteExpiredCustomerSessions() {
 }
 
 async function getValidCustomerSessionByToken(token) {
+  console.log('token in fn: ', token);
   if (!token) return undefined;
-  const session = await sql`
+  const customerSession = await sql`
   SELECT * FROM customer_sessions
   WHERE
-  token = ${token} and
+  token = ${token} AND
   expiry_timestamp > NOW()
   `;
-  return session;
+  console.log('customerSession:', customerSession);
+  return customerSession[0];
 }
 
 const typeDefs = gql`
   scalar Date
+  scalar Timestamp
   input customerSearch {
     id: ID
     number: [String]
@@ -150,6 +153,7 @@ const typeDefs = gql`
     customer(search: customerSearch!): Customer
     employees: [Employee]
     employee(search: employeeSearch!): Employee
+    customerSession(token: String!): Session
   }
   type Mutation {
     createCustomer(
@@ -174,16 +178,6 @@ const typeDefs = gql`
     dob: Date
     status: String
   }
-  # type CustomerWithoutPassword {
-  #   id: ID
-  #   number: String
-  #   first_name: String
-  #   last_name: String
-  #   email: String
-  #   phone_number: String
-  #   dob: Date
-  #   status: String
-  # }
   type Employee {
     id: ID
     number: String
@@ -194,15 +188,12 @@ const typeDefs = gql`
     dob: Date
     admin: Boolean
   }
-  # type EmployeeWithoutPassword {
-  #   id: ID
-  #   number: String
-  #   first_name: String
-  #   last_name: String
-  #   email: String
-  #   dob: Date
-  #   admin: Boolean
-  # }
+  type Session {
+    id: ID
+    token: String
+    expiry_timestamp: Timestamp
+    customer_id: ID
+  }
 `;
 
 const resolvers = {
@@ -276,6 +267,10 @@ const resolvers = {
         return getEmployeeByNumberWithHashedPassword(args.search.number[0]);
       }
     },
+    customerSession: (parent, args) => {
+      // console.log('args.token', args.token);
+      if (args.token) return getValidCustomerSessionByToken(args.token);
+    },
   },
   Mutation: {
     createCustomer: (parent, args) => {
@@ -287,7 +282,8 @@ const resolvers = {
 
 const app = express();
 const corsOptions = {
-  origin: 'http://localhost:19006',
+  origin: '*',
+  // origin: 'http://localhost:19006',
   credentials: true,
 };
 app.use(cors(corsOptions));
