@@ -124,6 +124,17 @@ async function deleteExpiredCustomerSessions() {
   return sessions;
 }
 
+async function getValidCustomerSessionByToken(token) {
+  if (!token) return undefined;
+  const session = await sql`
+  SELECT * FROM customer_sessions
+  WHERE
+  token = ${token} and
+  expiry_timestamp > NOW()
+  `;
+  return session;
+}
+
 const typeDefs = gql`
   scalar Date
   input customerSearch {
