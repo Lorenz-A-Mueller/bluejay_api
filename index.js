@@ -160,7 +160,7 @@ const typeDefs = gql`
     customer(search: customerSearch!): Customer
     employees: [Employee]
     employee(search: employeeSearch!): Employee
-    customerSession(token: String!): Session
+    customerSession: Session
     deleteAllExpiredCustomerSessions: [Session]
     tickets: [Ticket]
   }
@@ -214,7 +214,7 @@ const typeDefs = gql`
     created: String #???
     assignee_id: ID
     title: String
-    message: [String]
+    messages: [String]
   }
 `;
 
@@ -289,9 +289,15 @@ const resolvers = {
         return getEmployeeByNumberWithHashedPassword(args.search.number[0]);
       }
     },
-    customerSession: (parent, args) => {
+    customerSession: (parent, args, context) => {
       // console.log('args.token', args.token);
-      if (args.token) return getValidCustomerSessionByToken(args.token);
+      const cookieWithName = context.req.headers.cookie;
+      const sessionCookie = cookieWithName.split('=')[1];
+      console.log('sessionCookie', sessionCookie);
+      const sessionCookieWithEqualSigns = sessionCookie.replace(/\%3D/g, '=');
+      console.log('sessionCookieWithEqualSigns: ', sessionCookieWithEqualSigns);
+
+      return getValidCustomerSessionByToken(sessionCookieWithEqualSigns);
     },
     deleteAllExpiredCustomerSessions: () => {
       return deleteExpiredCustomerSessions();
@@ -309,9 +315,11 @@ const resolvers = {
 };
 
 const app = express();
+
 const corsOptions = {
-  origin: '*',
-  // origin: 'http://localhost:19006',
+  // origin: '*',
+  origin: 'http://localhost:19006',
+  // origin: 'http://localhost:3000',
   credentials: true,
 };
 app.use(cors(corsOptions));
@@ -321,7 +329,8 @@ const server = new ApolloServer({
   resolvers,
   introspection: true,
   playground: true,
-  context: ({ res }) => ({
+  context: ({ req, res }) => ({
+    req,
     res,
   }),
 });
@@ -343,3 +352,6 @@ const main = async () => {
 };
 
 main();
+
+// tbO4QnGon9Ced9qkHJx1qnsYf97DdLU4yibwiKOsnM2gHUL8SKgcIUov7GQ7SriJHo80hsLIb2zJ5syMDyWJ9A%3D%3D
+// tbO4QnGon9Ced9qkHJx1qnsYf97DdLU4yibwiKOsnM2gHUL8SKgcIUov7GQ7SriJHo80hsLIb2zJ5syMDyWJ9A==
