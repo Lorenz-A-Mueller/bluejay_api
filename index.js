@@ -144,6 +144,17 @@ async function getAllTickets() {
   return tickets;
 }
 
+async function createTicket(number, customer, category, title, messages) {
+  const ticket = await sql`
+  INSERT INTO tickets
+  (ticket_number, status, last_response, customer_id, category, priority, created, assignee_id, title, messages)
+VALUES
+  (${number}, 'NEW', current_timestamp, ${customer}, ${category}, 'normal', current_timestamp, NULL, ${title}, ARRAY[${messages}])
+  RETURNING *
+  `;
+  return ticket[0];
+}
+
 const typeDefs = gql`
   scalar Date
   scalar Timestamp
@@ -175,6 +186,14 @@ const typeDefs = gql`
       dob: Date!
       status: String!
     ): Customer
+
+    createNewTicket(
+      ticket_number: String
+      customer_id: ID
+      category: String
+      title: String
+      messages: [Int]
+    ): Ticket
   }
   type Customer {
     id: ID
@@ -214,7 +233,7 @@ const typeDefs = gql`
     created: String #???
     assignee_id: ID
     title: String
-    messages: [String]
+    messages: [Int]
   }
 `;
 
@@ -292,12 +311,14 @@ const resolvers = {
     customerSession: (parent, args, context) => {
       // console.log('args.token', args.token);
       const cookieWithName = context.req.headers.cookie;
-      const sessionCookie = cookieWithName.split('=')[1];
-      console.log('sessionCookie', sessionCookie);
-      const sessionCookieWithEqualSigns = sessionCookie.replace(/\%3D/g, '=');
-      console.log('sessionCookieWithEqualSigns: ', sessionCookieWithEqualSigns);
+      const sessionCookieEscapeCharacters = cookieWithName.split('=')[1];
+      const sessionCookie = sessionCookieEscapeCharacters
+        .replace(/\%3D/g, '=')
+        .replace(/\%2B/g, '+')
+        .replace(/\%2F/g, '/');
+      console.log('sessionCookie: ', sessionCookie);
 
-      return getValidCustomerSessionByToken(sessionCookieWithEqualSigns);
+      return getValidCustomerSessionByToken(sessionCookie);
     },
     deleteAllExpiredCustomerSessions: () => {
       return deleteExpiredCustomerSessions();
@@ -311,6 +332,15 @@ const resolvers = {
       args.password = hashPassword(args.password);
       return createCustomer(args);
     },
+    createNewTicket: (parent, args) => {
+      return createTicket(
+        args.ticket_number,
+        args.customer_id,
+        args.category,
+        args.title,
+        args.messages,
+      );
+    },
   },
 };
 
@@ -318,8 +348,8 @@ const app = express();
 
 const corsOptions = {
   // origin: '*',
-  origin: 'http://localhost:19006',
-  // origin: 'http://localhost:3000',
+  // origin: 'http://localhost:19006',
+  origin: 'http://localhost:3000',
   credentials: true,
 };
 app.use(cors(corsOptions));
@@ -355,3 +385,8 @@ main();
 
 // tbO4QnGon9Ced9qkHJx1qnsYf97DdLU4yibwiKOsnM2gHUL8SKgcIUov7GQ7SriJHo80hsLIb2zJ5syMDyWJ9A%3D%3D
 // tbO4QnGon9Ced9qkHJx1qnsYf97DdLU4yibwiKOsnM2gHUL8SKgcIUov7GQ7SriJHo80hsLIb2zJ5syMDyWJ9A==
+// ujgOZqRHrfxHlbSS+KvvQU4qCcfTAvhdtfQ7iuO7K8MWpBvjkZWJYh4Wid/n2v/xmadENBFfhqzngqTZ9p/dqA==
+// ujgOZqRHrfxHlbSS%2BKvvQU4qCcfTAvhdtfQ7iuO7K8MWpBvjkZWJYh4Wid%2Fn2v%2FxmadENBFfhqzngqTZ9p%2FdqA==
+
+// kO1KX/Moa59CkrIIdKPbxISQHhCmwjfP8bcR/Mx7SfhxclldDFSf3+hjKO9Ltvhb10XfNO36r3Yp8tuoZIHUuw==
+// kO1KX/Moa59CkrIIdKPbxISQHhCmwjfP8bcR/Mx7SfhxclldDFSf3+hjKO9Ltvhb10XfNO36r3Yp8tuoZIHUuw==
