@@ -361,8 +361,8 @@ const resolvers = {
 const app = express();
 
 const corsOptions = {
-  origin: '*',
-  // origin: ['http://localhost:3000', 'http://localhost:19006'],
+  // origin: '*',
+  origin: ['http://localhost:3000', 'http://localhost:19006'],
   credentials: true,
 };
 app.use(cors(corsOptions));
