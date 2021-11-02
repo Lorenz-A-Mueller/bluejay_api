@@ -147,6 +147,15 @@ async function getAllTickets() {
   return tickets;
 }
 
+async function getTicketById(id) {
+  const ticket = await sql`
+  SELECT * FROM tickets
+  WHERE
+  id=${id}
+  `;
+  return ticket[0];
+}
+
 async function createTicket(customer, category, title, messages) {
   const ticket = await sql`
   INSERT INTO tickets
@@ -177,6 +186,7 @@ const typeDefs = gql`
     customerSession: Session
     deleteAllExpiredCustomerSessions: [Session]
     tickets: [Ticket]
+    ticket(id: ID): Ticket
   }
   type Mutation {
     createCustomer(
@@ -328,6 +338,9 @@ const resolvers = {
     tickets: () => {
       return getAllTickets();
     },
+    ticket: (parent, args) => {
+      return getTicketById(args.id);
+    },
   },
   Mutation: {
     createCustomer: (parent, args) => {
@@ -348,8 +361,8 @@ const resolvers = {
 const app = express();
 
 const corsOptions = {
-  // origin: '*',
-  origin: ['http://localhost:3000', 'http://localhost:19006'],
+  origin: '*',
+  // origin: ['http://localhost:3000', 'http://localhost:19006'],
   credentials: true,
 };
 app.use(cors(corsOptions));
