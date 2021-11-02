@@ -3,6 +3,9 @@ const { AuthenticationError, UserInputError } = require('apollo-server-errors');
 const crypto = require('node:crypto');
 const setPostgresDefaultsOnHeroku = require('./setPostgresDefaultsOnHeroku.js');
 const { hashPassword, verifyPassword } = require('./utils/auth.js');
+const {
+  createRandomTicketNumber,
+} = require('./utils/createRandomTicketNumber');
 const cors = require('cors');
 const express = require('express');
 
@@ -144,12 +147,12 @@ async function getAllTickets() {
   return tickets;
 }
 
-async function createTicket(number, customer, category, title, messages) {
+async function createTicket(customer, category, title, messages) {
   const ticket = await sql`
   INSERT INTO tickets
   (ticket_number, status, last_response, customer_id, category, priority, created, assignee_id, title, messages)
 VALUES
-  (${number}, 'NEW', current_timestamp, ${customer}, ${category}, 'normal', current_timestamp, NULL, ${title}, ARRAY[${messages}])
+  (${createRandomTicketNumber()}, 'NEW', current_timestamp, ${customer}, ${category}, 'normal', current_timestamp, NULL, ${title}, ARRAY[${messages}])
   RETURNING *
   `;
   return ticket[0];
@@ -188,7 +191,6 @@ const typeDefs = gql`
     ): Customer
 
     createNewTicket(
-      ticket_number: String
       customer_id: ID
       category: String
       title: String
@@ -334,7 +336,6 @@ const resolvers = {
     },
     createNewTicket: (parent, args) => {
       return createTicket(
-        args.ticket_number,
         args.customer_id,
         args.category,
         args.title,
@@ -348,8 +349,7 @@ const app = express();
 
 const corsOptions = {
   // origin: '*',
-  // origin: 'http://localhost:19006',
-  origin: 'http://localhost:3000',
+  origin: ['http://localhost:3000', 'http://localhost:19006'],
   credentials: true,
 };
 app.use(cors(corsOptions));
