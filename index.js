@@ -173,7 +173,7 @@ async function getMessageById(id) {
   WHERE
   id = ${id}
   ;`;
-  return message;
+  return message[0];
 }
 
 async function createMessage(customerId, messageContent) {
