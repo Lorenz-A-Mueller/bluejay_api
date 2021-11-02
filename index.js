@@ -167,6 +167,26 @@ VALUES
   return ticket[0];
 }
 
+async function getMessageById(id) {
+  const message = await sql`
+  SELECT * FROM messages
+  WHERE
+  id = ${id}
+  ;`;
+  return message;
+}
+
+async function createMessage(customerId, messageContent) {
+  const message = await sql`
+  INSERT INTO messages
+  (customer_id, created, content)
+  VALUES
+  (${customerId}, current_timestamp, ${messageContent})
+  RETURNING *
+  `;
+  return message[0];
+}
+
 const typeDefs = gql`
   scalar Date
   scalar Timestamp
@@ -187,6 +207,7 @@ const typeDefs = gql`
     deleteAllExpiredCustomerSessions: [Session]
     tickets: [Ticket]
     ticket(id: ID): Ticket
+    message(id: ID): Message
   }
   type Mutation {
     createCustomer(
@@ -206,6 +227,7 @@ const typeDefs = gql`
       title: String
       messages: [Int]
     ): Ticket
+    createNewMessage(customer_id: ID!, content: String!): Message
   }
   type Customer {
     id: ID
@@ -246,6 +268,12 @@ const typeDefs = gql`
     assignee_id: ID
     title: String
     messages: [Int]
+  }
+  type Message {
+    id: ID
+    customer_id: ID
+    created: String
+    content: String
   }
 `;
 
@@ -341,6 +369,9 @@ const resolvers = {
     ticket: (parent, args) => {
       return getTicketById(args.id);
     },
+    message: (parent, args) => {
+      return getMessageById(args.id);
+    },
   },
   Mutation: {
     createCustomer: (parent, args) => {
@@ -355,14 +386,17 @@ const resolvers = {
         args.messages,
       );
     },
+    createNewMessage: (parent, args) => {
+      return createMessage(args.customer_id, args.content);
+    },
   },
 };
 
 const app = express();
 
 const corsOptions = {
-  // origin: '*',
-  origin: ['http://localhost:3000', 'http://localhost:19006'],
+  origin: '*',
+  // origin: ['http://localhost:3000', 'http://localhost:19006'],
   credentials: true,
 };
 app.use(cors(corsOptions));
