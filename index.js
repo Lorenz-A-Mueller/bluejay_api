@@ -117,6 +117,17 @@ async function createCustomerSession(token, id) {
   return session[0];
 }
 
+async function createEmployeeSession(token, id) {
+  const session = await sql`
+  INSERT INTO employee_sessions
+  (token, employee_id)
+  VALUES
+  (${token}, ${id})
+  RETURNING *
+  `;
+  return session[0];
+}
+
 async function deleteExpiredCustomerSessions() {
   const sessions = await sql`
   DELETE FROM customer_sessions
@@ -138,6 +149,29 @@ async function getValidCustomerSessionByToken(token) {
   `;
   console.log('customerSession:', customerSession);
   return customerSession[0];
+}
+
+async function getValidEmployeeSessionByToken(token) {
+  console.log('token in fn: ', token);
+  if (!token) return undefined;
+  const employeeSession = await sql`
+  SELECT * FROM employee_sessions
+  WHERE
+  token = ${token} AND
+  expiry_timestamp > NOW()
+  `;
+  console.log('employeeSession:', employeeSession);
+  return employeeSession[0];
+}
+
+async function deleteExpiredEmployeeSessions() {
+  const sessions = await sql`
+  DELETE FROM employee_sessions
+  WHERE
+  expiry_timestamp < NOW()
+  RETURNING *
+  `;
+  return sessions;
 }
 
 async function getAllTickets() {
@@ -203,8 +237,10 @@ const typeDefs = gql`
     customer(search: customerSearch!): Customer
     employees: [Employee]
     employee(search: employeeSearch!): Employee
-    customerSession: Session
-    deleteAllExpiredCustomerSessions: [Session]
+    customerSession: CustomerSession
+    employeeSession: EmployeeSession
+    deleteAllExpiredCustomerSessions: [CustomerSession]
+    deleteAllExpiredEmployeeSessions: [EmployeeSession]
     tickets: [Ticket]
     ticket(id: ID): Ticket
     message(id: ID): Message
@@ -250,11 +286,17 @@ const typeDefs = gql`
     dob: Date
     admin: Boolean
   }
-  type Session {
+  type CustomerSession {
     id: ID
     token: String
     expiry_timestamp: Timestamp
     customer_id: ID
+  }
+  type EmployeeSession {
+    id: ID
+    token: String
+    expiry_timestamp: Timestamp
+    employee_id: ID
   }
   type Ticket {
     id: ID
@@ -342,10 +384,60 @@ const resolvers = {
     employees: () => {
       return getEmployees();
     },
-    employee: (parent, args) => {
+    employee: async (parent, args, context) => {
       if (args.search.id) return getEmployeeById(args.search.id);
       if (args.search.number) {
-        return getEmployeeByNumberWithHashedPassword(args.search.number[0]);
+        console.log('first arg: ', args.search.number[0]);
+        console.log('second arg: ', args.search.number[1]);
+
+        if (!args.search.number[0] || !args.search.number[1]) {
+          throw new UserInputError(
+            'Employee Number and Password are required!',
+          );
+        }
+
+        const hashedPasswordInDb = await getEmployeeByNumberWithHashedPassword(
+          args.search.number[0],
+        );
+
+        const passWordsMatch = await verifyPassword(
+          args.search.number[1],
+          hashedPasswordInDb.password_hashed,
+        );
+        console.log('passwordsmatch', passWordsMatch);
+        if (passWordsMatch) {
+          // destructure -> only return the employee without the hashed_password
+
+          const { password_hashed, ...employeeWithoutHashedPassword } =
+            await getEmployeeByNumberWithHashedPassword(args.search.number[0]);
+
+          // clean ALL expired sessions
+
+          deleteExpiredEmployeeSessions();
+
+          // generate a random token
+
+          const token = crypto.randomBytes(64).toString('base64');
+
+          // safe token and client id as a session in the DB
+
+          const newSession = await createEmployeeSession(
+            token,
+            employeeWithoutHashedPassword.id,
+          );
+
+          // set employee's sessionToken cookie with the stored token value
+          context.res.cookie('sessionToken', newSession.token, {
+            httpOnly: true,
+          });
+
+          return employeeWithoutHashedPassword;
+          // context.res.sendStatus(200); // ???
+        }
+        // if (!passWordsMatch) {
+        throw new AuthenticationError(
+          'Employee Number / Password combination did not match!',
+        );
       }
     },
     customerSession: (parent, args, context) => {
@@ -359,6 +451,14 @@ const resolvers = {
       console.log('sessionCookie: ', sessionCookie);
 
       return getValidCustomerSessionByToken(sessionCookie);
+    },
+    employeeSession: (parent, args, context) => {
+      // cookie gets already sent in the right form
+      const sessionCookie = context.req.headers.cookie;
+
+      console.log('sessionCookie: ', sessionCookie);
+
+      return getValidEmployeeSessionByToken(sessionCookie);
     },
     deleteAllExpiredCustomerSessions: () => {
       return deleteExpiredCustomerSessions();
