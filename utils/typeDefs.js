@@ -21,7 +21,7 @@ exports.typeDefs = gql`
     deleteAllExpiredCustomerSessions: [CustomerSession]
     deleteAllExpiredEmployeeSessions: [EmployeeSession]
     tickets: [Ticket]
-    ticket(id: ID): Ticket
+    ticket(customer_id: ID): Ticket
     message(id: ID): Message
     messages(ticket_id: ID): [Message]
   }

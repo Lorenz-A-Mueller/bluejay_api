@@ -179,11 +179,11 @@ exports.getAllTickets = async () => {
   return tickets;
 };
 
-exports.getTicketById = async (id) => {
+exports.getTicketByCustomerId = async (id) => {
   const ticket = await sql`
   SELECT * FROM tickets
   WHERE
-  id=${id}
+  customer_id=${id}
   `;
   return ticket[0];
 };

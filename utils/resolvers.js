@@ -15,7 +15,7 @@ const {
   deleteExpiredCustomerSessions,
   deleteExpiredEmployeeSessions,
   getAllTickets,
-  getTicketById,
+  getTicketByCustomerId,
   createTicket,
   getValidCustomerSessionByToken,
   getValidEmployeeSessionByToken,
@@ -158,7 +158,7 @@ exports.resolvers = {
       return getAllTickets();
     },
     ticket: (parent, args) => {
-      return getTicketById(args.id);
+      return getTicketByCustomerId(args.customer_id);
     },
     message: (parent, args) => {
       return getMessageById(args.id);
