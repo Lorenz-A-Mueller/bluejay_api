@@ -21,6 +21,7 @@ const {
   getValidEmployeeSessionByToken,
   getMessageById,
   createMessage,
+  createMessageWithResponderId,
   deleteEmployeeSessionByEmployeeId,
   getMessages,
 } = require('./dbFunctions');
@@ -177,6 +178,13 @@ exports.resolvers = {
     },
     createNewMessage: (parent, args) => {
       return createMessage(args.ticket_id, args.content);
+    },
+    createNewMessageWithResponderId: (parent, args) => {
+      return createMessageWithResponderId(
+        args.ticket_id,
+        args.content,
+        args.responder_id,
+      );
     },
     deleteEmployeeSession: (parent, args) => {
       return deleteEmployeeSessionByEmployeeId(args.employee_id);

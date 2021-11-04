@@ -39,6 +39,11 @@ exports.typeDefs = gql`
 
     createNewTicket(customer_id: ID, category: String, title: String): Ticket
     createNewMessage(ticket_id: ID!, content: String!): Message
+    createNewMessageWithResponderId(
+      ticket_id: ID!
+      content: String!
+      responder_id: ID!
+    ): Message
 
     deleteEmployeeSession(employee_id: ID): EmployeeSession
   }
@@ -91,5 +96,6 @@ exports.typeDefs = gql`
     ticket_id: ID
     created: String
     content: String
+    responder_id: ID
   }
 `;

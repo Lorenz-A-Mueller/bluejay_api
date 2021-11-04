@@ -211,9 +211,24 @@ exports.getMessageById = async (id) => {
 exports.createMessage = async (ticketId, messageContent) => {
   const message = await sql`
   INSERT INTO messages
-  (ticket_id, created, content)
+  (ticket_id, created, content, responder_id)
   VALUES
-  (${ticketId}, current_timestamp, ${messageContent})
+  (${ticketId}, current_timestamp, ${messageContent}, NULL)
+  RETURNING *
+  `;
+  return message[0];
+};
+
+exports.createMessageWithResponderId = async (
+  ticketId,
+  messageContent,
+  responderId,
+) => {
+  const message = await sql`
+  INSERT INTO messages
+  (ticket_id, created, content, responder_id)
+  VALUES
+  (${ticketId}, current_timestamp, ${messageContent}, ${responderId})
   RETURNING *
   `;
   return message[0];
