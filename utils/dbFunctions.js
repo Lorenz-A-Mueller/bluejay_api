@@ -179,6 +179,15 @@ exports.getAllTickets = async () => {
   return tickets;
 };
 
+exports.getTicketById = async (id) => {
+  const ticket = await sql`
+  SELECT * FROM tickets
+  WHERE
+  id=${id}
+  `;
+  return ticket[0];
+};
+
 exports.getTicketByCustomerId = async (id) => {
   const ticket = await sql`
   SELECT * FROM tickets

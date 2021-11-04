@@ -11,6 +11,10 @@ exports.typeDefs = gql`
     id: ID
     number: [String]
   }
+  input ticketSearch {
+    id: ID
+    customer_id: ID
+  }
   type Query {
     customers: [Customer]
     customer(search: customerSearch!): Customer
@@ -21,7 +25,7 @@ exports.typeDefs = gql`
     deleteAllExpiredCustomerSessions: [CustomerSession]
     deleteAllExpiredEmployeeSessions: [EmployeeSession]
     tickets: [Ticket]
-    ticket(customer_id: ID): Ticket
+    ticket(search: ticketSearch!): Ticket
     message(id: ID): Message
     messages(ticket_id: ID): [Message]
   }
