@@ -6,7 +6,7 @@ export async function up(
 
 CREATE TABLE messages(
 id integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-customer_id integer REFERENCES customers (id),
+ticket_id integer REFERENCES tickets (id),
 created timestamp NOT NULL,
 content varchar(1000) NOT NULL
 );

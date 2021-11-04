@@ -22,6 +22,7 @@ const {
   getMessageById,
   createMessage,
   deleteEmployeeSessionByEmployeeId,
+  getMessages,
 } = require('./dbFunctions');
 
 exports.resolvers = {
@@ -161,6 +162,9 @@ exports.resolvers = {
     message: (parent, args) => {
       return getMessageById(args.id);
     },
+    messages: (parent, args) => {
+      return getMessages(args.ticket_id);
+    },
   },
   Mutation: {
     createCustomer: (parent, args) => {
@@ -169,15 +173,10 @@ exports.resolvers = {
       return createCustomer(args);
     },
     createNewTicket: (parent, args) => {
-      return createTicket(
-        args.customer_id,
-        args.category,
-        args.title,
-        args.messages,
-      );
+      return createTicket(args.customer_id, args.category, args.title);
     },
     createNewMessage: (parent, args) => {
-      return createMessage(args.customer_id, args.content);
+      return createMessage(args.ticket_id, args.content);
     },
     deleteEmployeeSession: (parent, args) => {
       return deleteEmployeeSessionByEmployeeId(args.employee_id);

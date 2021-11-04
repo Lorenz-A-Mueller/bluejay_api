@@ -188,12 +188,12 @@ exports.getTicketById = async (id) => {
   return ticket[0];
 };
 
-exports.createTicket = async (customer, category, title, messages) => {
+exports.createTicket = async (customer, category, title) => {
   const ticket = await sql`
   INSERT INTO tickets
-  (ticket_number, status, last_response, customer_id, category, priority, created, assignee_id, title, messages)
+  (ticket_number, status, last_response, customer_id, category, priority, created, assignee_id, title)
 VALUES
-  (${createRandomTicketNumber()}, 'NEW', current_timestamp, ${customer}, ${category}, 'normal', current_timestamp, NULL, ${title}, ARRAY[${messages}])
+  (${createRandomTicketNumber()}, 'NEW', current_timestamp, ${customer}, ${category}, 'normal', current_timestamp, NULL, ${title})
   RETURNING *
   `;
   return ticket[0];
@@ -208,13 +208,22 @@ exports.getMessageById = async (id) => {
   return message[0];
 };
 
-exports.createMessage = async (customerId, messageContent) => {
+exports.createMessage = async (ticketId, messageContent) => {
   const message = await sql`
   INSERT INTO messages
-  (customer_id, created, content)
+  (ticket_id, created, content)
   VALUES
-  (${customerId}, current_timestamp, ${messageContent})
+  (${ticketId}, current_timestamp, ${messageContent})
   RETURNING *
   `;
   return message[0];
+};
+
+exports.getMessages = async (ticketId) => {
+  const messages = await sql`
+  SELECT * FROM messages
+  WHERE
+  ticket_id = ${ticketId};
+  `;
+  return messages;
 };

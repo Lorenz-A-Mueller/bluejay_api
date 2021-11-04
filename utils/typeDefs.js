@@ -23,6 +23,7 @@ exports.typeDefs = gql`
     tickets: [Ticket]
     ticket(id: ID): Ticket
     message(id: ID): Message
+    messages(ticket_id: ID): [Message]
   }
   type Mutation {
     createCustomer(
@@ -36,13 +37,8 @@ exports.typeDefs = gql`
       status: String!
     ): Customer
 
-    createNewTicket(
-      customer_id: ID
-      category: String
-      title: String
-      messages: [Int]
-    ): Ticket
-    createNewMessage(customer_id: ID!, content: String!): Message
+    createNewTicket(customer_id: ID, category: String, title: String): Ticket
+    createNewMessage(ticket_id: ID!, content: String!): Message
 
     deleteEmployeeSession(employee_id: ID): EmployeeSession
   }
@@ -89,11 +85,10 @@ exports.typeDefs = gql`
     created: String #???
     assignee_id: ID
     title: String
-    messages: [Int]
   }
   type Message {
     id: ID
-    customer_id: ID
+    ticket_id: ID
     created: String
     content: String
   }

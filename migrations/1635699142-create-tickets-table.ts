@@ -14,8 +14,7 @@ category varchar(20) NOT NULL,
 priority varchar(20) NOT NULL,
 created timestamp NOT NULL,
 assignee_id integer REFERENCES employees (id),
-title varchar (50) NOT NULL,
-messages integer[] NOT NULL
+title varchar (50) NOT NULL
 );
 	`;
 }
