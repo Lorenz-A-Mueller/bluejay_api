@@ -43,6 +43,8 @@ exports.typeDefs = gql`
       messages: [Int]
     ): Ticket
     createNewMessage(customer_id: ID!, content: String!): Message
+
+    deleteEmployeeSession(employee_id: ID): EmployeeSession
   }
   type Customer {
     id: ID
@@ -63,7 +65,6 @@ exports.typeDefs = gql`
     email: String
     password_hashed: String
     dob: Date
-    admin: Boolean
   }
   type CustomerSession {
     id: ID

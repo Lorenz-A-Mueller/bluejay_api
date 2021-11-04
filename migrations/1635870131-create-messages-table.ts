@@ -19,7 +19,7 @@ export async function down(
   console.log('Dropping tickets table');
   await sql`
 
-	DROP TABLE tickets;
+	DROP TABLE messages;
 
 	`;
 }

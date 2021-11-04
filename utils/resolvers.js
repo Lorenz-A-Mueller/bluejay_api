@@ -21,6 +21,7 @@ const {
   getValidEmployeeSessionByToken,
   getMessageById,
   createMessage,
+  deleteEmployeeSessionByEmployeeId,
 } = require('./dbFunctions');
 
 exports.resolvers = {
@@ -31,9 +32,6 @@ exports.resolvers = {
     customer: async (parent, args, context) => {
       if (args.search.id) return getCustomerById(args.search.id);
       if (args.search.number) {
-        console.log('first arg: ', args.search.number[0]);
-        console.log('second arg: ', args.search.number[1]);
-
         if (!args.search.number[0] || !args.search.number[1]) {
           throw new UserInputError('Password and Username are required!');
         }
@@ -45,7 +43,6 @@ exports.resolvers = {
           args.search.number[1],
           hashedPasswordInDb.password_hashed,
         );
-        console.log('passwordsmatch', passWordsMatch);
         if (passWordsMatch) {
           // destructure -> only return the customer without the hashed_password
 
@@ -67,7 +64,7 @@ exports.resolvers = {
             customerWithoutHashedPassword.id,
           );
 
-          // set client's sessionToken cookie with the stored token value
+          // set token as cookie
           context.res.cookie('customerSessionToken', newSession.token, {
             httpOnly: true,
           });
@@ -75,7 +72,7 @@ exports.resolvers = {
           return customerWithoutHashedPassword;
           // context.res.sendStatus(200); // ???
         }
-        // if (!passWordsMatch) {
+
         throw new AuthenticationError(
           'Password/Username combination did not match!',
         );
@@ -87,9 +84,6 @@ exports.resolvers = {
     employee: async (parent, args, context) => {
       if (args.search.id) return getEmployeeById(args.search.id);
       if (args.search.number) {
-        console.log('first arg: ', args.search.number[0]);
-        console.log('second arg: ', args.search.number[1]);
-
         if (!args.search.number[0] || !args.search.number[1]) {
           throw new UserInputError(
             'Employee Number and Password are required!',
@@ -104,7 +98,6 @@ exports.resolvers = {
           args.search.number[1],
           hashedPasswordInDb.password_hashed,
         );
-        console.log('passwordsmatch', passWordsMatch);
         if (passWordsMatch) {
           // destructure -> only return the employee without the hashed_password
 
@@ -126,7 +119,8 @@ exports.resolvers = {
             employeeWithoutHashedPassword.id,
           );
 
-          // set employee's sessionToken cookie with the stored token value
+          // set token as cookie
+
           context.res.cookie('employeeSessionToken', newSession.token, {
             httpOnly: true,
           });
@@ -134,30 +128,25 @@ exports.resolvers = {
           return employeeWithoutHashedPassword;
           // context.res.sendStatus(200); // ???
         }
-        // if (!passWordsMatch) {
         throw new AuthenticationError(
           'Employee Number / Password combination did not match!',
         );
       }
     },
     customerSession: (parent, args, context) => {
-      // console.log('args.token', args.token);
-      const cookieWithName = context.req.headers.cookie;
-      const sessionCookieEscapeCharacters = cookieWithName.split('=')[1];
+      const cookiesString = context.req.headers.cookie;
+      const sessionCookieEscapeCharacters = cookiesString.split(
+        'customerSessionToken=',
+      )[1];
       const sessionCookie = sessionCookieEscapeCharacters
-        .replace(/\%3D/g, '=')
-        .replace(/\%2B/g, '+')
-        .replace(/\%2F/g, '/');
-      console.log('sessionCookie: ', sessionCookie);
-
+        .replace(/%3D/g, '=')
+        .replace(/%2B/g, '+')
+        .replace(/%2F/g, '/');
       return getValidCustomerSessionByToken(sessionCookie);
     },
     employeeSession: (parent, args, context) => {
       // cookie gets already sent in the right form
       const sessionCookie = context.req.headers.cookie;
-
-      console.log('sessionCookie: ', sessionCookie);
-
       return getValidEmployeeSessionByToken(sessionCookie);
     },
     deleteAllExpiredCustomerSessions: () => {
@@ -175,6 +164,7 @@ exports.resolvers = {
   },
   Mutation: {
     createCustomer: (parent, args) => {
+      // #TODO
       args.password = hashPassword(args.password);
       return createCustomer(args);
     },
@@ -188,6 +178,9 @@ exports.resolvers = {
     },
     createNewMessage: (parent, args) => {
       return createMessage(args.customer_id, args.content);
+    },
+    deleteEmployeeSession: (parent, args) => {
+      return deleteEmployeeSessionByEmployeeId(args.employee_id);
     },
   },
 };

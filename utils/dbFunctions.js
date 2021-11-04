@@ -70,7 +70,7 @@ exports.createCustomer = async (newCustomer) => {
 exports.getEmployees = async () => {
   const employees = await sql`
   SELECT
-  number, first_name, last_name, email, dob, admin
+  number, first_name, last_name, email, dob
   FROM employees;
   `;
   return employees;
@@ -79,7 +79,7 @@ exports.getEmployees = async () => {
 exports.getEmployeeById = async (id) => {
   const employee = await sql`
   SELECT
-  number, first_name, last_name, email, password_hashed, dob, admin
+  number, first_name, last_name, email, password_hashed, dob
   FROM employees
   WHERE id=${id};
   `;
@@ -160,6 +160,16 @@ exports.deleteExpiredEmployeeSessions = async () => {
   RETURNING *
   `;
   return sessions;
+};
+
+exports.deleteEmployeeSessionByEmployeeId = async (id) => {
+  const session = await sql`
+  DELETE FROM employee_sessions
+  WHERE
+  employee_id = ${id}
+  RETURNING *
+  `;
+  return session[0];
 };
 
 exports.getAllTickets = async () => {
