@@ -50,6 +50,7 @@ exports.typeDefs = gql`
     ): Message
 
     deleteEmployeeSession(employee_id: ID): EmployeeSession
+    deleteTicket(id: ID!): Ticket
   }
   type Customer {
     id: ID

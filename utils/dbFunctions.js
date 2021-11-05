@@ -208,6 +208,16 @@ VALUES
   return ticket[0];
 };
 
+exports.deleteTicketById = async (id) => {
+  const ticket = await sql`
+  DELETE FROM tickets
+  WHERE
+  id = ${id}
+  RETURNING *;
+  `;
+  return ticket[0];
+};
+
 exports.getMessageById = async (id) => {
   const message = await sql`
   SELECT * FROM messages
