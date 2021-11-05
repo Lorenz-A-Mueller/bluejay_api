@@ -28,6 +28,7 @@ exports.typeDefs = gql`
     ticket(search: ticketSearch!): Ticket
     message(id: ID): Message
     messages(ticket_id: ID): [Message]
+    status(id: ID): Status
   }
   type Mutation {
     createCustomer(
@@ -87,7 +88,7 @@ exports.typeDefs = gql`
   type Ticket {
     id: ID
     ticket_number: String
-    status: String
+    status: ID
     last_response: String #????
     customer_id: ID
     category: String
@@ -102,5 +103,9 @@ exports.typeDefs = gql`
     created: String
     content: String
     responder_id: ID
+  }
+  type Status {
+    id: ID!
+    status_name: String!
   }
 `;

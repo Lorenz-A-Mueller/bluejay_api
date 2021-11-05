@@ -7,7 +7,7 @@ export async function up(
 INSERT INTO tickets
 (ticket_number, status, last_response, customer_id, category, priority, created, assignee_id, title)
 VALUES
-('#111111111', 'ONGOING', '2021-10-31 18:22:00', 1, 'complaint', 'urgent', '2021-10-31 18:22:00', 1, 'This is a complaint')
+('#111111111', 2, '2021-10-31 18:22:00', 1, 'complaint', 'urgent', '2021-10-31 18:22:00', 1, 'This is a complaint')
 	`;
 }
 

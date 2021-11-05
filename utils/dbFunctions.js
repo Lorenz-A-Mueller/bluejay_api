@@ -202,7 +202,7 @@ exports.createTicket = async (customer, category, title) => {
   INSERT INTO tickets
   (ticket_number, status, last_response, customer_id, category, priority, created, assignee_id, title)
 VALUES
-  (${createRandomTicketNumber()}, 'NEW', current_timestamp, ${customer}, ${category}, 'normal', current_timestamp, NULL, ${title})
+  (${createRandomTicketNumber()}, 1, current_timestamp, ${customer}, ${category}, 'normal', current_timestamp, NULL, ${title})
   RETURNING *
   `;
   return ticket[0];
@@ -260,4 +260,13 @@ exports.getMessages = async (ticketId) => {
   ticket_id = ${ticketId};
   `;
   return messages;
+};
+
+exports.getStatus = async (id) => {
+  const status = await sql`
+  SELECT * FROM ticket_status
+  WHERE
+  id = ${id};
+  `;
+  return status[0];
 };

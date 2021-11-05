@@ -7,7 +7,7 @@ export async function up(
 CREATE TABLE tickets(
 id integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
 ticket_number varchar(10) NOT NULL,
-status varchar(10) NOT NULL,
+status integer REFERENCES ticket_status (id) NOT NULL,
 last_response timestamp NOT NULL,
 customer_id integer REFERENCES customers (id),
 category varchar(20) NOT NULL,

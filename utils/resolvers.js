@@ -26,6 +26,7 @@ const {
   createMessageWithResponderId,
   deleteEmployeeSessionByEmployeeId,
   getMessages,
+  getStatus,
 } = require('./dbFunctions');
 
 exports.resolvers = {
@@ -170,6 +171,9 @@ exports.resolvers = {
     },
     messages: (parent, args) => {
       return getMessages(args.ticket_id);
+    },
+    status: (parent, args) => {
+      return getStatus(args.id);
     },
   },
   Mutation: {
