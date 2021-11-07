@@ -29,6 +29,8 @@ const {
   getMessages,
   getStatus,
   getStatuses,
+  getCategories,
+  getCategory,
 } = require('./dbFunctions');
 
 exports.resolvers = {
@@ -201,6 +203,12 @@ exports.resolvers = {
     },
     statuses: () => {
       return getStatuses();
+    },
+    category: (parent, args) => {
+      return getCategory(args.id);
+    },
+    categories: () => {
+      return getCategories();
     },
   },
   Mutation: {

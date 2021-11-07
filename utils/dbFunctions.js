@@ -292,3 +292,21 @@ exports.getStatuses = async () => {
   `;
   return statuses;
 };
+
+exports.getCategory = async (id) => {
+  const category = await sql`
+  SELECT * FROM ticket_categories
+  WHERE
+  id = ${id};
+  `;
+  return category[0];
+};
+
+exports.getCategories = async () => {
+  const categories = await sql`
+  SELECT
+ *
+  FROM ticket_categories
+  `;
+  return categories;
+};

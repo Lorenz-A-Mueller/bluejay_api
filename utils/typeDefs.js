@@ -30,6 +30,8 @@ exports.typeDefs = gql`
     messages(ticket_id: ID): [Message]
     status(id: ID): Status
     statuses: [Status]
+    categories: [Category]
+    category(id: ID): Category
   }
   type Mutation {
     createCustomer(
@@ -109,5 +111,9 @@ exports.typeDefs = gql`
   type Status {
     id: ID!
     status_name: String!
+  }
+  type Category {
+    id: ID!
+    category_name: String!
   }
 `;
