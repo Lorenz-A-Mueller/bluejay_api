@@ -70,7 +70,7 @@ exports.createCustomer = async (newCustomer) => {
 exports.getEmployees = async () => {
   const employees = await sql`
   SELECT
-  number, first_name, last_name, email, dob
+  *
   FROM employees;
   `;
   return employees;
@@ -135,7 +135,7 @@ exports.getValidCustomerSessionByToken = async (token) => {
   token = ${token} AND
   expiry_timestamp > NOW()
   `;
-  console.log('customerSession:', customerSession);
+  console.log('customerSession:', customerSession[0]);
   return customerSession[0];
 };
 
@@ -188,11 +188,13 @@ exports.getTicketById = async (id) => {
   return ticket[0];
 };
 
-exports.getTicketByCustomerId = async (id) => {
+exports.getUnclosedTicketByCustomerId = async (id) => {
   const ticket = await sql`
   SELECT * FROM tickets
   WHERE
   customer_id=${id}
+  AND
+  status != 3
   `;
   return ticket[0];
 };
@@ -214,6 +216,17 @@ exports.deleteTicketById = async (id) => {
   WHERE
   id = ${id}
   RETURNING *;
+  `;
+  return ticket[0];
+};
+
+exports.changeTicketStatusByIdAndStatusId = async (id, statusId) => {
+  const ticket = await sql`
+  UPDATE tickets
+  SET status = ${statusId}
+  WHERE id = ${id}
+  RETURNING *;
+
   `;
   return ticket[0];
 };
@@ -269,4 +282,13 @@ exports.getStatus = async (id) => {
   id = ${id};
   `;
   return status[0];
+};
+
+exports.getStatuses = async () => {
+  const statuses = await sql`
+  SELECT
+ *
+  FROM ticket_status
+  `;
+  return statuses;
 };

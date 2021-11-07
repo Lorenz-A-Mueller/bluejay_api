@@ -15,10 +15,11 @@ const {
   deleteExpiredCustomerSessions,
   deleteExpiredEmployeeSessions,
   getAllTickets,
-  getTicketByCustomerId,
+  getUnclosedTicketByCustomerId,
   getTicketById,
   createTicket,
   deleteTicketById,
+  changeTicketStatusByIdAndStatusId,
   getValidCustomerSessionByToken,
   getValidEmployeeSessionByToken,
   getMessageById,
@@ -27,6 +28,7 @@ const {
   deleteEmployeeSessionByEmployeeId,
   getMessages,
   getStatus,
+  getStatuses,
 } = require('./dbFunctions');
 
 exports.resolvers = {
@@ -140,14 +142,36 @@ exports.resolvers = {
     },
     customerSession: (parent, args, context) => {
       const cookiesString = context.req.headers.cookie;
-      const sessionCookieEscapeCharacters = cookiesString.split(
+      console.log('cookiesString', cookiesString);
+
+      const cookieStringSplit = cookiesString.split(' ');
+      console.log('cookieStringSplit', cookieStringSplit);
+      const customerSessionCookieString = cookieStringSplit.filter(
+        (segment) => {
+          return segment.includes('customerSessionToken');
+        },
+      )[0];
+      console.log('customerSessionCookieString', customerSessionCookieString);
+      const sessionCookieString = customerSessionCookieString.split(
         'customerSessionToken=',
       )[1];
-      const sessionCookie = sessionCookieEscapeCharacters
+
+      const sessionCookie = sessionCookieString
         .replace(/%3D/g, '=')
         .replace(/%2B/g, '+')
         .replace(/%2F/g, '/');
+      console.log('SESSIONCOOKIE', sessionCookie);
       return getValidCustomerSessionByToken(sessionCookie);
+
+      // const sessionCookieEscapeCharacters = cookiesString.split(
+      //   'customerSessionToken=',
+      // )[1];
+      // const sessionCookie = sessionCookieEscapeCharacters
+      //   .replace(/%3D/g, '=')
+      //   .replace(/%2B/g, '+')
+      //   .replace(/%2F/g, '/');
+      // console.log('SESSIONCOOKIE', sessionCookie);
+      // return getValidCustomerSessionByToken(sessionCookie);
     },
     employeeSession: (parent, args, context) => {
       // cookie gets already sent in the right form
@@ -163,7 +187,7 @@ exports.resolvers = {
     ticket: (parent, args) => {
       if (args.search.id) return getTicketById(args.search.id);
       if (args.search.customer_id) {
-        return getTicketByCustomerId(args.search.customer_id);
+        return getUnclosedTicketByCustomerId(args.search.customer_id);
       }
     },
     message: (parent, args) => {
@@ -174,6 +198,9 @@ exports.resolvers = {
     },
     status: (parent, args) => {
       return getStatus(args.id);
+    },
+    statuses: () => {
+      return getStatuses();
     },
   },
   Mutation: {
@@ -200,6 +227,9 @@ exports.resolvers = {
     },
     deleteTicket: (parent, args) => {
       return deleteTicketById(args.id);
+    },
+    changeTicketStatus: (parent, args) => {
+      return changeTicketStatusByIdAndStatusId(args.id, args.status);
     },
   },
 };
