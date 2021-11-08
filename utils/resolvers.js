@@ -31,6 +31,7 @@ const {
   getStatuses,
   getCategories,
   getCategory,
+  getTicketsByTimeFrame,
 } = require('./dbFunctions');
 
 exports.resolvers = {
@@ -191,6 +192,9 @@ exports.resolvers = {
       if (args.search.customer_id) {
         return getUnclosedTicketByCustomerId(args.search.customer_id);
       }
+    },
+    ticketsByTimeFrame: (parent, args) => {
+      return getTicketsByTimeFrame(args.startTime, args.endTime);
     },
     message: (parent, args) => {
       return getMessageById(args.id);

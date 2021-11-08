@@ -179,6 +179,15 @@ exports.getAllTickets = async () => {
   return tickets;
 };
 
+exports.getTicketsByTimeFrame = async (startTime, endTime) => {
+  const tickets = await sql`
+  SELECT * FROM tickets
+  WHERE
+  created BETWEEN ${startTime} AND ${endTime}
+  `;
+  return tickets;
+};
+
 exports.getTicketById = async (id) => {
   const ticket = await sql`
   SELECT * FROM tickets

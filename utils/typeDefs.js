@@ -32,6 +32,7 @@ exports.typeDefs = gql`
     statuses: [Status]
     categories: [Category]
     category(id: ID): Category
+    ticketsByTimeFrame(startTime: String, endTime: String): [Ticket]
   }
   type Mutation {
     createCustomer(
