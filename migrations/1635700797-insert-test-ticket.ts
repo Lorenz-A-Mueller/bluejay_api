@@ -29,7 +29,7 @@ const createRandomTickets = (
       lastResponse: transformTimestampIntoDatetime(Date.now().toString()),
       customerId: 1,
       category: Math.ceil(Math.random() * 5),
-      priority: 'normal',
+      priority: Math.ceil(Math.random() * 2),
       created: transformTimestampIntoDatetime(
         (
           startTimestamp +
@@ -51,18 +51,19 @@ export async function up(
     arg3: string,
     arg4: number,
     arg5: number,
-    arg6: string,
+    arg6: number,
     arg7: string,
     arg8: number,
     arg9: string,
   ) => Promise<string[]>,
 ) {
   console.log('Inserting test ticket into tickets table...');
-  const randomData = createRandomTickets(200, 1602154191000);
+  const randomData = createRandomTickets(7, 1636066800000);
 
   // 1633690191000 8.10.2021
   // 1602154191000 8.10.2020
   // 1631098191000 8.9.2021
+  // 1636066800000 5.11.2021
 
   for (const row of randomData) {
     await sql`

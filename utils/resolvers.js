@@ -1,6 +1,10 @@
 const { AuthenticationError, UserInputError } = require('apollo-server-errors');
 const crypto = require('node:crypto');
 const { hashPassword, verifyPassword } = require('./auth.js');
+const {
+  parseCustomerSessionCookie,
+  parseEmployeeSessionCookie,
+} = require('./parseCookie');
 
 const {
   getCustomers,
@@ -14,6 +18,7 @@ const {
   createEmployeeSession,
   deleteExpiredCustomerSessions,
   deleteExpiredEmployeeSessions,
+  deleteCustomerSessionByToken,
   getAllTickets,
   getUnclosedTicketByCustomerId,
   getTicketById,
@@ -25,13 +30,15 @@ const {
   getMessageById,
   createMessage,
   createMessageWithResponderId,
-  deleteEmployeeSessionByEmployeeId,
   getMessages,
   getStatus,
   getStatuses,
   getCategories,
   getCategory,
   getTicketsByTimeFrame,
+  deleteEmployeeSession,
+  getPriority,
+  getPriorities,
 } = require('./dbFunctions');
 
 exports.resolvers = {
@@ -144,40 +151,14 @@ exports.resolvers = {
       }
     },
     customerSession: (parent, args, context) => {
+      // context.req.headers.cookie is a large string that contains all cookies, must get parsed first
       const cookiesString = context.req.headers.cookie;
-      console.log('cookiesString', cookiesString);
-
-      const cookieStringSplit = cookiesString.split(' ');
-      console.log('cookieStringSplit', cookieStringSplit);
-      const customerSessionCookieString = cookieStringSplit.filter(
-        (segment) => {
-          return segment.includes('customerSessionToken');
-        },
-      )[0];
-      console.log('customerSessionCookieString', customerSessionCookieString);
-      const sessionCookieString = customerSessionCookieString.split(
-        'customerSessionToken=',
-      )[1];
-
-      const sessionCookie = sessionCookieString
-        .replace(/%3D/g, '=')
-        .replace(/%2B/g, '+')
-        .replace(/%2F/g, '/');
-      console.log('SESSIONCOOKIE', sessionCookie);
-      return getValidCustomerSessionByToken(sessionCookie);
-
-      // const sessionCookieEscapeCharacters = cookiesString.split(
-      //   'customerSessionToken=',
-      // )[1];
-      // const sessionCookie = sessionCookieEscapeCharacters
-      //   .replace(/%3D/g, '=')
-      //   .replace(/%2B/g, '+')
-      //   .replace(/%2F/g, '/');
-      // console.log('SESSIONCOOKIE', sessionCookie);
-      // return getValidCustomerSessionByToken(sessionCookie);
+      console.log('HHEeeeeeere');
+      const sessionToken = parseCustomerSessionCookie(cookiesString);
+      return getValidCustomerSessionByToken(sessionToken);
     },
     employeeSession: (parent, args, context) => {
-      // cookie gets already sent in the right form
+      // context.req.header.cookie only includes the sessionCookie (parsed already via next.js)
       const sessionCookie = context.req.headers.cookie;
       return getValidEmployeeSessionByToken(sessionCookie);
     },
@@ -214,6 +195,12 @@ exports.resolvers = {
     categories: () => {
       return getCategories();
     },
+    priority: (parent, args) => {
+      return getPriority(args.id);
+    },
+    priorities: () => {
+      return getPriorities();
+    },
   },
   Mutation: {
     createCustomer: (parent, args) => {
@@ -234,8 +221,15 @@ exports.resolvers = {
         args.responder_id,
       );
     },
-    deleteEmployeeSession: (parent, args) => {
-      return deleteEmployeeSessionByEmployeeId(args.employee_id);
+    deleteEmployeeSession: (parent, args, context) => {
+      const cookiesString = context.req.headers.cookie;
+      const sessionToken = parseEmployeeSessionCookie(cookiesString);
+      return deleteEmployeeSession(sessionToken);
+    },
+    deleteCustomerSession: (parent, args, context) => {
+      const cookiesString = context.req.headers.cookie;
+      const sessionToken = parseCustomerSessionCookie(cookiesString);
+      return deleteCustomerSessionByToken(sessionToken);
     },
     deleteTicket: (parent, args) => {
       return deleteTicketById(args.id);
@@ -245,3 +239,6 @@ exports.resolvers = {
     },
   },
 };
+
+// RQE3MLW/wyZstX7Sop4Cmj/N9AxWVXgFA6gd0zuCfYSTxnMoZWMOAQHjqLJTDU26DzjjhfcXaknPqHyE30n35A==;
+// RQE3MLW/wyZstX7Sop4Cmj/N9AxWVXgFA6gd0zuCfYSTxnMoZWMOAQHjqLJTDU26DzjjhfcXaknPqHyE30n35A==

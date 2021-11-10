@@ -11,7 +11,7 @@ status integer REFERENCES ticket_status (id) NOT NULL,
 last_response timestamp NOT NULL,
 customer_id integer REFERENCES customers (id),
 category integer REFERENCES ticket_categories (id) NOT NULL,
-priority varchar(20) NOT NULL,
+priority integer REFERENCES ticket_priorities (id) NOT NULL,
 created timestamp NOT NULL,
 assignee_id integer REFERENCES employees (id),
 title varchar (50) NOT NULL

@@ -8,6 +8,7 @@ const employees = [
     email: 'jennifer.smith@bluejay.com',
     password: 'JenniferTestPassword1',
     dob: '1970-05-11',
+    role: 1,
   },
   {
     number: '00002',
@@ -16,6 +17,7 @@ const employees = [
     email: 'john.hilton@bluejay.com',
     password: 'JohnTestPassword1',
     dob: '1980-05-09',
+    role: 2,
   },
   {
     number: '00003',
@@ -24,6 +26,7 @@ const employees = [
     email: 'lisa.verdi@bluejay.com',
     password: 'LisaTestPassword1',
     dob: '1988-10-08',
+    role: 2,
   },
   {
     number: '00004',
@@ -32,6 +35,7 @@ const employees = [
     email: 'abdullah.khan@bluejay.com',
     password: 'AbdullahTestPassword1',
     dob: '1966-12-28',
+    role: 2,
   },
   {
     number: '00005',
@@ -40,6 +44,7 @@ const employees = [
     email: 'tatyana.melnikova@bluejay.com',
     password: 'TatyanaTestPassword1',
     dob: '1979-03-20',
+    role: 2,
   },
   {
     number: '00006',
@@ -48,6 +53,7 @@ const employees = [
     email: 'quentin.york@bluejay.com',
     password: 'QuentinTestPassword1',
     dob: '1990-01-02',
+    role: 2,
   },
 ];
 
@@ -60,6 +66,7 @@ export async function up(
     arg5: string,
     arg6: string,
     arg7: string,
+    arg8: number,
   ) => Promise<string[]>,
 ) {
   console.log('Inserting employees into employees table...');
@@ -68,9 +75,9 @@ export async function up(
     const hashedPassword = await hashPassword(person.password);
     await sql`
 		INSERT INTO employees
-		(number, first_name, last_name, email, password_hashed, dob)
+		(number, first_name, last_name, email, password_hashed, dob, role)
 		VALUES
-		(${person.number}, ${person.firstName}, ${person.lastName}, ${person.email}, ${hashedPassword}, ${person.dob});
+		(${person.number}, ${person.firstName}, ${person.lastName}, ${person.email}, ${hashedPassword}, ${person.dob}, ${person.role});
 			`;
   }
   return;

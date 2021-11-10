@@ -33,6 +33,8 @@ exports.typeDefs = gql`
     categories: [Category]
     category(id: ID): Category
     ticketsByTimeFrame(startTime: String, endTime: String): [Ticket]
+    priority(id: ID): Priority
+    priorities: [Priority]
   }
   type Mutation {
     createCustomer(
@@ -54,9 +56,10 @@ exports.typeDefs = gql`
       responder_id: ID!
     ): Message
 
-    deleteEmployeeSession(employee_id: ID): EmployeeSession
+    deleteEmployeeSession: EmployeeSession
     deleteTicket(id: ID!): Ticket
     changeTicketStatus(id: ID!, status: ID!): Ticket
+    deleteCustomerSession: CustomerSession
   }
   type Customer {
     id: ID
@@ -97,7 +100,7 @@ exports.typeDefs = gql`
     last_response: String #????
     customer_id: ID
     category: ID
-    priority: String
+    priority: ID
     created: String #???
     assignee_id: ID
     title: String
@@ -116,5 +119,9 @@ exports.typeDefs = gql`
   type Category {
     id: ID!
     category_name: String!
+  }
+  type Priority {
+    id: ID!
+    priority_name: String!
   }
 `;

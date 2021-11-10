@@ -11,7 +11,8 @@ first_name varchar(30) NOT NULL,
 last_name varchar(30) NOT NULL,
 email varchar(30) NOT NULL,
 password_hashed varchar(60) NOT NULL,
-dob date NOT NULL
+dob date NOT NULL,
+role integer REFERENCES roles(id)
 );
 	`;
 }

@@ -162,12 +162,21 @@ exports.deleteExpiredEmployeeSessions = async () => {
   return sessions;
 };
 
-exports.deleteEmployeeSessionByEmployeeId = async (id) => {
+exports.deleteEmployeeSession = async (token) => {
   const session = await sql`
   DELETE FROM employee_sessions
   WHERE
-  employee_id = ${id}
+  token = ${token}
   RETURNING *
+  `;
+  return session[0];
+};
+
+exports.deleteCustomerSessionByToken = async (token) => {
+  const session = await sql`
+  DELETE from customer_sessions
+  WHERE token = ${token}
+  RETURNING *;
   `;
   return session[0];
 };
@@ -318,4 +327,22 @@ exports.getCategories = async () => {
   FROM ticket_categories
   `;
   return categories;
+};
+
+exports.getPriority = async (id) => {
+  const priority = await sql`
+  SELECT * FROM ticket_priorities
+  WHERE
+  id = ${id};
+  `;
+  return priority[0];
+};
+
+exports.getPriorities = async () => {
+  const priorities = await sql`
+  SELECT
+ *
+  FROM ticket_priorities
+  `;
+  return priorities;
 };
