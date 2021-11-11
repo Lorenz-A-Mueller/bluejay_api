@@ -31,7 +31,7 @@ const { createRandomTicketNumber } = require('./createRandomTicketNumber');
 exports.getCustomers = async () => {
   const customers = await sql`
   SELECT
-  number, first_name, last_name, email, password_hashed, phone_number, dob, status
+  id, number, first_name, last_name, email, phone_number, dob, status
   FROM customers;
   `;
   return customers;
@@ -79,7 +79,7 @@ exports.getEmployees = async () => {
 exports.getEmployeeById = async (id) => {
   const employee = await sql`
   SELECT
-  number, first_name, last_name, email, password_hashed, dob
+  id, number, first_name, last_name, email, dob, role
   FROM employees
   WHERE id=${id};
   `;
@@ -249,6 +249,28 @@ exports.changeTicketStatusByIdAndStatusId = async (id, statusId) => {
   return ticket[0];
 };
 
+exports.changeTicketPriorityByIdAndPriorityId = async (id, priorityId) => {
+  const ticket = await sql`
+  UPDATE tickets
+  SET priority = ${priorityId}
+  WHERE id = ${id}
+  RETURNING *;
+  `;
+  return ticket[0];
+};
+
+exports.changeTicketAssigneeByIdAndEmployeeId = async (id, employeeId) => {
+  console.log('id', id);
+  console.log('employeeId', employeeId);
+  const ticket = await sql`
+  UPDATE tickets
+  SET assignee_id = ${employeeId}
+  WHERE id = ${id}
+  RETURNING *;
+  `;
+  return ticket[0];
+};
+
 exports.getMessageById = async (id) => {
   const message = await sql`
   SELECT * FROM messages
@@ -345,4 +367,22 @@ exports.getPriorities = async () => {
   FROM ticket_priorities
   `;
   return priorities;
+};
+
+exports.getRoles = async () => {
+  const roles = await sql`
+  SELECT
+ *
+  FROM roles
+  `;
+  return roles;
+};
+
+exports.getRole = async (id) => {
+  const role = await sql`
+  SELECT * FROM roles
+  WHERE
+  id = ${id};
+  `;
+  return role[0];
 };

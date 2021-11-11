@@ -39,6 +39,10 @@ const {
   deleteEmployeeSession,
   getPriority,
   getPriorities,
+  getRoles,
+  getRole,
+  changeTicketPriorityByIdAndPriorityId,
+  changeTicketAssigneeByIdAndEmployeeId,
 } = require('./dbFunctions');
 
 exports.resolvers = {
@@ -201,6 +205,12 @@ exports.resolvers = {
     priorities: () => {
       return getPriorities();
     },
+    roles: () => {
+      return getRoles();
+    },
+    role: (parent, args) => {
+      return getRole(args.id);
+    },
   },
   Mutation: {
     createCustomer: (parent, args) => {
@@ -236,6 +246,12 @@ exports.resolvers = {
     },
     changeTicketStatus: (parent, args) => {
       return changeTicketStatusByIdAndStatusId(args.id, args.status);
+    },
+    changeTicketPriority: (parent, args) => {
+      return changeTicketPriorityByIdAndPriorityId(args.id, args.priority);
+    },
+    changeTicketAssignee: (parent, args) => {
+      return changeTicketAssigneeByIdAndEmployeeId(args.id, args.assignee_id);
     },
   },
 };

@@ -35,6 +35,8 @@ exports.typeDefs = gql`
     ticketsByTimeFrame(startTime: String, endTime: String): [Ticket]
     priority(id: ID): Priority
     priorities: [Priority]
+    roles: [Role]
+    role(id: ID): Role
   }
   type Mutation {
     createCustomer(
@@ -59,6 +61,8 @@ exports.typeDefs = gql`
     deleteEmployeeSession: EmployeeSession
     deleteTicket(id: ID!): Ticket
     changeTicketStatus(id: ID!, status: ID!): Ticket
+    changeTicketPriority(id: ID!, priority: ID!): Ticket
+    changeTicketAssignee(id: ID!, assignee_id: ID!): Ticket
     deleteCustomerSession: CustomerSession
   }
   type Customer {
@@ -80,6 +84,7 @@ exports.typeDefs = gql`
     email: String
     password_hashed: String
     dob: Date
+    role: ID
   }
   type CustomerSession {
     id: ID
@@ -123,5 +128,9 @@ exports.typeDefs = gql`
   type Priority {
     id: ID!
     priority_name: String!
+  }
+  type Role {
+    id: ID!
+    role_name: String!
   }
 `;
