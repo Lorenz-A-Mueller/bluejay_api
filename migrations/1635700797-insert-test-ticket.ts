@@ -58,7 +58,7 @@ export async function up(
   ) => Promise<string[]>,
 ) {
   console.log('Inserting test ticket into tickets table...');
-  const randomData = createRandomTickets(7, 1636066800000);
+  const randomData = createRandomTickets(1000, 1602517120000);
 
   // 1633690191000 8.10.2021
   // 1602154191000 8.10.2020

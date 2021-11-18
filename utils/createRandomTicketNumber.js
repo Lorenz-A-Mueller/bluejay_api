@@ -7,4 +7,13 @@ const createRandomTicketNumber = () => {
   return '#' + randomTicketNumber;
 };
 
-module.exports = { createRandomTicketNumber };
+const createRandomCustomerNumber = () => {
+  let randomCustomerNumber = '';
+  for (let i = 0; i < 8; i++) {
+    const randomInteger = Math.floor(Math.random() * 10);
+    randomCustomerNumber = randomCustomerNumber + randomInteger;
+  }
+  return randomCustomerNumber;
+};
+
+module.exports = { createRandomTicketNumber, createRandomCustomerNumber };

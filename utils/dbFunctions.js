@@ -1,3 +1,4 @@
+const { AuthenticationError, UserInputError } = require('apollo-server-errors');
 require('dotenv').config();
 const postgres = require('postgres');
 const setPostgresDefaultsOnHeroku = require('../setPostgresDefaultsOnHeroku.js');
@@ -26,7 +27,10 @@ function connectOneTimeToDatabase() {
 
 const sql = connectOneTimeToDatabase();
 
-const { createRandomTicketNumber } = require('./createRandomTicketNumber');
+const {
+  createRandomTicketNumber,
+  createRandomCustomerNumber,
+} = require('./createRandomTicketNumber');
 
 exports.getCustomers = async () => {
   const customers = await sql`
@@ -55,14 +59,21 @@ exports.getCustomerByNumberWithHashedPassword = async (number) => {
   return customer[0];
 };
 
-exports.createCustomer = async (newCustomer) => {
+exports.createCustomer = async (
+  firstName,
+  lastName,
+  email,
+  passwordHashed,
+  phoneNumber,
+  dob,
+) => {
   const customer = await sql`
   INSERT INTO customers
-  (first_name, last_name, email, password, phone_number, dob, status)
+  (number, first_name, last_name, email, password_hashed, phone_number, dob, status)
   VALUES
-  (${newCustomer.first_name}, ${newCustomer.last_name}, ${newCustomer.email}, ${newCustomer.password}, ${newCustomer.phone_number}, ${newCustomer.dob}, ${newCustomer.status})
+  (${createRandomCustomerNumber()}, ${firstName}, ${lastName}, ${email}, ${passwordHashed}, ${phoneNumber}, ${dob}, 'premium')
   RETURNING
-  (first_name, last_name, email, phone_number, dob, status)
+  id, number, first_name, last_name, email, phone_number, dob, status
   `;
   return customer[0];
 };
@@ -148,7 +159,7 @@ exports.getValidEmployeeSessionByToken = async (token) => {
   token = ${token} AND
   expiry_timestamp > NOW()
   `;
-  console.log('employeeSession:', employeeSession);
+  console.log('employeeSession[0]: ', employeeSession[0]);
   return employeeSession[0];
 };
 
@@ -222,7 +233,7 @@ exports.createTicket = async (customer, category, title) => {
   INSERT INTO tickets
   (ticket_number, status, last_response, customer_id, category, priority, created, assignee_id, title)
 VALUES
-  (${createRandomTicketNumber()}, 1, current_timestamp, ${customer}, ${category}, 'normal', current_timestamp, NULL, ${title})
+  (${createRandomTicketNumber()}, 1, current_timestamp, ${customer}, ${category}, 1, current_timestamp, NULL, ${title})
   RETURNING *
   `;
   return ticket[0];

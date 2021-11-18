@@ -40,17 +40,15 @@ exports.typeDefs = gql`
   }
   type Mutation {
     createCustomer(
-      number: String!
       first_name: String!
       last_name: String!
       email: String!
-      password_hashed: String!
+      password: String!
       phone_number: String!
       dob: Date!
-      status: String!
     ): Customer
 
-    createNewTicket(customer_id: ID, category: String, title: String): Ticket
+    createNewTicket(customer_id: ID!, category: ID!, title: String!): Ticket
     createNewMessage(ticket_id: ID!, content: String!): Message
     createNewMessageWithResponderId(
       ticket_id: ID!

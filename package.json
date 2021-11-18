@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "apollo-server": "^3.4.0",
-    "apollo-server-errors": "^3.2.0",
+    "apollo-server-errors": "^3.3.0",
     "apollo-server-express": "^3.4.0",
     "apollo-server-plugin-http-headers": "^0.1.4",
     "apollo-server-types": "^3.3.0",

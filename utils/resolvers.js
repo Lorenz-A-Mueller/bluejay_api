@@ -1,4 +1,8 @@
-const { AuthenticationError, UserInputError } = require('apollo-server-errors');
+const {
+  AuthenticationError,
+  UserInputError,
+  ApolloError,
+} = require('apollo-server-errors');
 const crypto = require('node:crypto');
 const { hashPassword, verifyPassword } = require('./auth.js');
 const {
@@ -106,10 +110,12 @@ exports.resolvers = {
       if (args.search.id) return getEmployeeById(args.search.id);
       if (args.search.number) {
         if (!args.search.number[0] || !args.search.number[1]) {
+          console.log('this');
           throw new UserInputError(
             'Employee Number and Password are required!',
           );
         }
+        console.log('here');
 
         const hashedPasswordInDb = await getEmployeeByNumberWithHashedPassword(
           args.search.number[0],
@@ -157,14 +163,24 @@ exports.resolvers = {
     customerSession: (parent, args, context) => {
       // context.req.headers.cookie is a large string that contains all cookies, must get parsed first
       const cookiesString = context.req.headers.cookie;
-      console.log('HHEeeeeeere');
       const sessionToken = parseCustomerSessionCookie(cookiesString);
       return getValidCustomerSessionByToken(sessionToken);
     },
-    employeeSession: (parent, args, context) => {
+    employeeSession: async (parent, args, context) => {
       // context.req.header.cookie only includes the sessionCookie (parsed already via next.js)
       const sessionCookie = context.req.headers.cookie;
-      return getValidEmployeeSessionByToken(sessionCookie);
+      const validationResult = await getValidEmployeeSessionByToken(
+        sessionCookie,
+      );
+      console.log('validationResult: ', validationResult);
+      if (typeof validationResult === 'undefined') {
+        console.log('here');
+        throw new UserInputError('yes');
+        // throw new AuthenticationError('not authenticated');
+      } else {
+        console.log('there');
+        return validationResult;
+      }
     },
     deleteAllExpiredCustomerSessions: () => {
       return deleteExpiredCustomerSessions();
@@ -213,10 +229,17 @@ exports.resolvers = {
     },
   },
   Mutation: {
-    createCustomer: (parent, args) => {
+    createCustomer: async (parent, args) => {
       // #TODO
-      args.password = hashPassword(args.password);
-      return createCustomer(args);
+      args.password = await hashPassword(args.password);
+      return createCustomer(
+        args.first_name,
+        args.last_name,
+        args.email,
+        args.password,
+        args.phone_number,
+        args.dob,
+      );
     },
     createNewTicket: (parent, args) => {
       return createTicket(args.customer_id, args.category, args.title);
