@@ -5,7 +5,7 @@ exports.typeDefs = gql`
   scalar Timestamp
   input customerSearch {
     id: ID
-    number: [String]
+    emailAndPassword: [String]
   }
   input employeeSearch {
     id: ID

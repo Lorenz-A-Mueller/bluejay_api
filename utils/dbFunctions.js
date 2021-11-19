@@ -51,10 +51,10 @@ exports.getCustomerById = async (id) => {
   return customer[0];
 };
 
-exports.getCustomerByNumberWithHashedPassword = async (number) => {
+exports.getCustomerByEmailWithHashedPassword = async (email) => {
   const customer = await sql`
   SELECT * FROM customers
-  WHERE number=${number};
+  WHERE email=${email};
   `;
   return customer[0];
 };
@@ -396,4 +396,15 @@ exports.getRole = async (id) => {
   id = ${id};
   `;
   return role[0];
+};
+
+exports.getCustomerByEmail = async (email) => {
+  const customer = await sql`
+  SELECT
+  email
+  FROM customers
+  WHERE email = ${email}
+  `;
+  console.log('customer[0]: ', customer[0]);
+  return customer[0];
 };

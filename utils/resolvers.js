@@ -13,7 +13,7 @@ const {
 const {
   getCustomers,
   getCustomerById,
-  getCustomerByNumberWithHashedPassword,
+  getCustomerByEmailWithHashedPassword,
   createCustomer,
   getEmployees,
   getEmployeeById,
@@ -47,6 +47,7 @@ const {
   getRole,
   changeTicketPriorityByIdAndPriorityId,
   changeTicketAssigneeByIdAndEmployeeId,
+  getCustomerByEmail,
 } = require('./dbFunctions');
 
 exports.resolvers = {
@@ -56,23 +57,28 @@ exports.resolvers = {
     },
     customer: async (parent, args, context) => {
       if (args.search.id) return getCustomerById(args.search.id);
-      if (args.search.number) {
-        if (!args.search.number[0] || !args.search.number[1]) {
-          throw new UserInputError('Password and Username are required!');
+      if (args.search.emailAndPassword) {
+        if (
+          !args.search.emailAndPassword[0] ||
+          !args.search.emailAndPassword[1]
+        ) {
+          throw new UserInputError('Email and password are required!');
         }
 
-        const hashedPasswordInDb = await getCustomerByNumberWithHashedPassword(
-          args.search.number[0],
+        const hashedPasswordInDb = await getCustomerByEmailWithHashedPassword(
+          args.search.emailAndPassword[0],
         );
         const passWordsMatch = await verifyPassword(
-          args.search.number[1],
+          args.search.emailAndPassword[1],
           hashedPasswordInDb.password_hashed,
         );
         if (passWordsMatch) {
           // destructure -> only return the customer without the hashed_password
 
           const { password_hashed, ...customerWithoutHashedPassword } =
-            await getCustomerByNumberWithHashedPassword(args.search.number[0]);
+            await getCustomerByEmailWithHashedPassword(
+              args.search.emailAndPassword[0],
+            );
 
           // clean ALL expired sessions
 
@@ -230,8 +236,68 @@ exports.resolvers = {
   },
   Mutation: {
     createCustomer: async (parent, args) => {
-      // #TODO
+      // validation of input
+      if (!args.first_name) {
+        throw new UserInputError('First Name required.');
+      }
+      if (!args.last_name) {
+        throw new UserInputError('Last Name required.');
+      }
+      if (!args.email) {
+        throw new UserInputError('E-Mail required.');
+      }
+
+      if (!/^\S+@\S+\.\S+$/.test(args.email)) {
+        throw new UserInputError('Not a valid e-mail format.');
+      }
+      // check whether email unique in db
+
+      const matchingEmail = await getCustomerByEmail(args.email);
+      if (matchingEmail) {
+        throw new UserInputError('E-Mail already in use');
+      }
+
+      if (!args.phone_number) {
+        throw new UserInputError('Phone number required.');
+      }
+      if (args.phone_number.length < 9) {
+        throw new UserInputError(
+          'Phone number cannot be less than 9 characters',
+        );
+      }
+      if (args.phone_number.length > 20) {
+        throw new UserInputError('Phone number cannot exceed 20 characters.');
+      }
+      if (!args.dob) {
+        throw new UserInputError('Date of Birth is required.');
+      }
+      if (!/^\d\d-\d\d-\d\d\d\d$/.test(args.dob)) {
+        throw new UserInputError(
+          'Date of Birth must be entered in format MM-DD-YYYY.',
+        );
+      }
+
+      if (!args.password) {
+        throw new UserInputError('Password required.');
+      }
+      if (args.password.length < 8) {
+        throw new UserInputError(
+          'Password to short. Must be at least 8 characters long.',
+        );
+      }
+      if (args.password.length > 20) {
+        throw new UserInputError(
+          'Password to long. Must not exceed 20 characters.',
+        );
+      }
+      if (!/[A-Z]/g.test(args.password)) {
+        throw new UserInputError(
+          'Password must contain at least one uppercase letter',
+        );
+      }
+
       args.password = await hashPassword(args.password);
+
       return createCustomer(
         args.first_name,
         args.last_name,
@@ -278,6 +344,3 @@ exports.resolvers = {
     },
   },
 };
-
-// RQE3MLW/wyZstX7Sop4Cmj/N9AxWVXgFA6gd0zuCfYSTxnMoZWMOAQHjqLJTDU26DzjjhfcXaknPqHyE30n35A==;
-// RQE3MLW/wyZstX7Sop4Cmj/N9AxWVXgFA6gd0zuCfYSTxnMoZWMOAQHjqLJTDU26DzjjhfcXaknPqHyE30n35A==
