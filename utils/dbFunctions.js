@@ -194,7 +194,8 @@ exports.deleteCustomerSessionByToken = async (token) => {
 
 exports.getAllTickets = async () => {
   const tickets = await sql`
-  SELECT * FROM tickets;
+  SELECT * FROM tickets
+  ORDER BY last_response DESC
   `;
   return tickets;
 };
@@ -271,11 +272,19 @@ exports.changeTicketPriorityByIdAndPriorityId = async (id, priorityId) => {
 };
 
 exports.changeTicketAssigneeByIdAndEmployeeId = async (id, employeeId) => {
-  console.log('id', id);
-  console.log('employeeId', employeeId);
   const ticket = await sql`
   UPDATE tickets
   SET assignee_id = ${employeeId}
+  WHERE id = ${id}
+  RETURNING *;
+  `;
+  return ticket[0];
+};
+
+exports.changeTicketLastResponseById = async (id) => {
+  const ticket = await sql`
+  UPDATE tickets
+  set last_response = current_timestamp
   WHERE id = ${id}
   RETURNING *;
   `;

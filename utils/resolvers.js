@@ -47,6 +47,7 @@ const {
   getRole,
   changeTicketPriorityByIdAndPriorityId,
   changeTicketAssigneeByIdAndEmployeeId,
+  changeTicketLastResponseById,
   getCustomerByEmail,
 } = require('./dbFunctions');
 
@@ -178,13 +179,9 @@ exports.resolvers = {
       const validationResult = await getValidEmployeeSessionByToken(
         sessionCookie,
       );
-      console.log('validationResult: ', validationResult);
       if (typeof validationResult === 'undefined') {
-        console.log('here');
-        throw new UserInputError('yes');
-        // throw new AuthenticationError('not authenticated');
+        throw new AuthenticationError('No valid session token.');
       } else {
-        console.log('there');
         return validationResult;
       }
     },
@@ -313,12 +310,26 @@ exports.resolvers = {
     createNewMessage: (parent, args) => {
       return createMessage(args.ticket_id, args.content);
     },
-    createNewMessageWithResponderId: (parent, args) => {
-      return createMessageWithResponderId(
-        args.ticket_id,
-        args.content,
-        args.responder_id,
+    createNewMessageWithResponderId: async (parent, args, context) => {
+      // validation of sessionToken cookie
+      if (!context.req.headers.cookie) {
+        throw new AuthenticationError('No valid session token.');
+      }
+      const sessionCookie = parseEmployeeSessionCookie(
+        context.req.headers.cookie,
       );
+      const validationResult = await getValidEmployeeSessionByToken(
+        sessionCookie,
+      );
+      if (typeof validationResult === 'undefined') {
+        throw new AuthenticationError('No valid session token.');
+      } else {
+        return createMessageWithResponderId(
+          args.ticket_id,
+          args.content,
+          args.responder_id,
+        );
+      }
     },
     deleteEmployeeSession: (parent, args, context) => {
       const cookiesString = context.req.headers.cookie;
@@ -330,8 +341,22 @@ exports.resolvers = {
       const sessionToken = parseCustomerSessionCookie(cookiesString);
       return deleteCustomerSessionByToken(sessionToken);
     },
-    deleteTicket: (parent, args) => {
-      return deleteTicketById(args.id);
+    deleteTicket: async (parent, args, context) => {
+      // validate sessionToken Cookie
+      if (!context.req.headers.cookie) {
+        throw new AuthenticationError('No valid session token.');
+      }
+      const sessionCookie = parseEmployeeSessionCookie(
+        context.req.headers.cookie,
+      );
+      const validationResult = await getValidEmployeeSessionByToken(
+        sessionCookie,
+      );
+      if (typeof validationResult === 'undefined') {
+        throw new AuthenticationError('No valid session token.');
+      } else {
+        return deleteTicketById(args.id);
+      }
     },
     changeTicketStatus: (parent, args) => {
       return changeTicketStatusByIdAndStatusId(args.id, args.status);
@@ -341,6 +366,9 @@ exports.resolvers = {
     },
     changeTicketAssignee: (parent, args) => {
       return changeTicketAssigneeByIdAndEmployeeId(args.id, args.assignee_id);
+    },
+    changeTicketLastResponse: (parent, args) => {
+      return changeTicketLastResponseById(args.id);
     },
   },
 };

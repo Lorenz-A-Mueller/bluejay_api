@@ -53,7 +53,7 @@ export async function up(
     arg5: number,
     arg6: number,
     arg7: string,
-    arg8: number,
+    arg8: number | null,
     arg9: string,
   ) => Promise<string[]>,
 ) {

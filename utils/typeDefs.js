@@ -61,6 +61,7 @@ exports.typeDefs = gql`
     changeTicketStatus(id: ID!, status: ID!): Ticket
     changeTicketPriority(id: ID!, priority: ID!): Ticket
     changeTicketAssignee(id: ID!, assignee_id: ID!): Ticket
+    changeTicketLastResponse(id: ID!): Ticket
     deleteCustomerSession: CustomerSession
   }
   type Customer {
